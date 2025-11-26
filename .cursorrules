@@ -1,0 +1,77 @@
+# Whisky Nights Club - Cursor Rules
+
+## Project Overview
+Full-stack Next.js 14 application for managing whisky tasting events with Supabase backend.
+
+## Tech Stack
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- ShadCN UI
+- Supabase (Auth + Database)
+- Playwright for testing
+
+## Code Style
+
+### TypeScript
+- Use strict typing
+- Prefer interfaces over types for objects
+- Use type inference where possible
+- Avoid `any` type
+
+### Components
+- Use server components by default
+- Add 'use client' only when needed
+- Keep components small and focused
+- Extract reusable logic to hooks or utilities
+
+### Styling
+- Use Tailwind utility classes
+- Follow the whisky theme colors:
+  - Dark backgrounds: `bg-whisky-dark`, `bg-whisky-darker`
+  - Gold accents: `text-whisky-gold`, `border-whisky-gold`
+  - Use `text-gradient-gold` for headings
+- Prefer component composition over prop drilling
+
+### Database
+- All queries through server actions
+- Use RLS policies for security
+- Validate data on both client and server
+- Use proper TypeScript types from `lib/types.ts`
+
+## File Organization
+- Pages in `app/` directory
+- Server actions in `lib/actions/`
+- Components in `components/`
+- UI primitives in `components/ui/`
+- Types in `lib/types.ts`
+- Utils in `lib/utils.ts`
+
+## Best Practices
+- Always check user authentication and authorization
+- Use `revalidatePath` after mutations
+- Handle errors gracefully
+- Add loading states for async operations
+- Use semantic HTML
+- Ensure accessibility (ARIA labels, keyboard navigation)
+
+## Testing
+- Write Playwright tests for critical flows
+- Test both authenticated and unauthenticated paths
+- Mock external dependencies where appropriate
+- Run tests before pushing: `npm run test`
+
+## Security
+- Never expose service role key to client
+- Always verify admin role server-side
+- Use RLS policies on all tables
+- Sanitize user inputs
+- Use environment variables for secrets
+
+## Performance
+- Use server components for static content
+- Implement proper caching strategies
+- Optimize images with Next.js Image component
+- Lazy load heavy components
+- Monitor Core Web Vitals
+

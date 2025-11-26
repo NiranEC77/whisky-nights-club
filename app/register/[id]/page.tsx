@@ -1,0 +1,129 @@
+import { notFound, redirect } from 'next/navigation'
+import { getEventById } from '@/lib/actions/events'
+import { createRegistration } from '@/lib/actions/registrations'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { formatDate, formatCurrency } from '@/lib/utils'
+
+export const dynamic = 'force-dynamic'
+
+export default async function RegisterPage({ params }: { params: { id: string } }) {
+  const event = await getEventById(params.id)
+
+  if (!event) {
+    notFound()
+  }
+
+  if (event.available_seats <= 0) {
+    redirect(`/event/${event.id}`)
+  }
+
+  async function handleRegistration(formData: FormData) {
+    'use server'
+    
+    const result = await createRegistration(formData)
+    
+    if (result.error) {
+      // In a real app, you'd want to show this error to the user
+      console.error(result.error)
+      return
+    }
+    
+    redirect(`/success/${params.id}?registration=${result.data?.id}`)
+  }
+
+  return (
+    <div className="min-h-screen py-12 px-4">
+      <div className="container mx-auto max-w-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-serif font-bold text-gradient-gold mb-2">
+            Event Registration
+          </h1>
+          <p className="text-whisky-cream/70">
+            {event.title}
+          </p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Information</CardTitle>
+            <CardDescription>
+              Please provide your details to complete the registration
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form action={handleRegistration} className="space-y-6">
+              <input type="hidden" name="event_id" value={event.id} />
+
+              <div className="space-y-2">
+                <Label htmlFor="full_name">Full Name *</Label>
+                <Input
+                  id="full_name"
+                  name="full_name"
+                  placeholder="John Smith"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  required
+                />
+              </div>
+
+              <div className="border-t border-whisky-gold/20 pt-6 space-y-3">
+                <h3 className="font-semibold text-lg">Event Summary</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Event</span>
+                    <span>{event.title}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Date</span>
+                    <span>{formatDate(event.date)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Time</span>
+                    <span>{event.start_time}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-base pt-2 border-t border-whisky-gold/20">
+                    <span>Total</span>
+                    <span className="text-whisky-gold">{formatCurrency(event.price)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <Button type="submit" className="w-full" size="lg">
+                Complete Registration
+              </Button>
+
+              <p className="text-xs text-center text-whisky-cream/60">
+                By registering, you agree to receive payment instructions via email.
+                Your spot will be reserved upon payment confirmation.
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
