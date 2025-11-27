@@ -1,25 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { writeFile, mkdir } from 'fs/promises'
+import { join } from 'path'
 import { randomBytes } from 'crypto'
+import { existsSync } from 'fs'
 
 // Use dynamic runtime for file operations
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
-  console.log('Upload API route called')
+  console.log('=== Upload API route called ===')
+  console.log('Environment:', process.env.NODE_ENV)
   
   try {
     const formData = await request.formData()
     const file = formData.get('image') as File
     
-    console.log('File received:', file?.name, file?.size, file?.type)
+    console.log('File received:', {
+      name: file?.name,
+      size: file?.size,
+      type: file?.type
+    })
     
     if (!file || file.size === 0) {
       console.error('No file provided')
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file type (more lenient for cropped images)
+    // Validate file type (lenient for cropped images)
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/octet-stream']
     if (!allowedTypes.includes(file.type)) {
       console.error('Invalid file type:', file.type)
@@ -39,45 +47,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Try file system approach for local development
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { writeFile } = await import('fs/promises')
-        const { join } = await import('path')
-        
-        // Generate unique filename
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
-        
-        const timestamp = Date.now()
-        const randomString = randomBytes(8).toString('hex')
-        const filename = `event-${timestamp}-${randomString}.jpg`
+    // Generate unique filename
+    const timestamp = Date.now()
+    const randomString = randomBytes(8).toString('hex')
+    const filename = `event-${timestamp}-${randomString}.jpg`
 
-        const publicPath = join(process.cwd(), 'public', 'images', 'events', filename)
-        
-        console.log('Writing to:', publicPath)
-        await writeFile(publicPath, buffer)
-        console.log('File written successfully')
+    console.log('Generated filename:', filename)
 
-        const dbPath = `/images/events/${filename}`
-        return NextResponse.json({ path: dbPath })
-      } catch (fsError) {
-        console.error('File system write failed:', fsError)
-        // Fall through to return error
-      }
+    // Ensure events directory exists
+    const eventsDir = join(process.cwd(), 'public', 'images', 'events')
+    console.log('Events directory path:', eventsDir)
+    
+    if (!existsSync(eventsDir)) {
+      console.log('Creating events directory...')
+      await mkdir(eventsDir, { recursive: true })
     }
 
-    // For production or if file system fails, we'll need Supabase Storage
-    console.error('File upload not configured for production. Use Supabase Storage.')
-    return NextResponse.json(
-      { error: 'Image upload is only available in development mode. Please contact administrator.' },
-      { status: 500 }
-    )
+    // Convert file to buffer
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    console.log('Buffer created, size:', buffer.length)
+
+    // Write file
+    const publicPath = join(eventsDir, filename)
+    console.log('Writing to:', publicPath)
+    
+    await writeFile(publicPath, buffer)
+    console.log('✅ File written successfully!')
+
+    // Return path for database
+    const dbPath = `/images/events/${filename}`
+    console.log('Returning path:', dbPath)
+    
+    return NextResponse.json({ path: dbPath })
 
   } catch (error) {
-    console.error('Error in upload route:', error)
+    console.error('❌ Error in upload route:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
+    
     return NextResponse.json(
-      { error: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      { 
+        error: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        details: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }
