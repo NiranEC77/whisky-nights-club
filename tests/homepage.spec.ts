@@ -5,7 +5,7 @@ test.describe('Homepage', () => {
     await page.goto('/')
     
     // Check for main heading
-    await expect(page.locator('h1')).toContainText('Whisky Nights Club')
+    await expect(page.locator('h1')).toContainText('Redhead WHISKY')
     
     // Check for navigation
     await expect(page.locator('header')).toBeVisible()

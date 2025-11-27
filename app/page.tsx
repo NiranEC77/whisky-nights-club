@@ -20,13 +20,13 @@ export default async function HomePage() {
               <Wine className="h-20 w-20 text-whisky-gold animate-fade-in" />
             </div>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in">
-              Whisky Nights Club
+              Redhead WHISKY
             </h1>
             <p className="text-xl md:text-2xl text-whisky-cream/80 animate-fade-in">
               Experience the finest spirits in an atmosphere of elegance and warmth
             </p>
             <p className="text-lg text-whisky-cream/60 animate-fade-in">
-              Join us for exclusive tasting events where every pour tells a story
+              Join us for exclusive virtual whisky tasting events
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="border-t border-whisky-gold/20 py-8 px-4 mt-16">
         <div className="container mx-auto text-center text-whisky-cream/60">
-          <p>&copy; {new Date().getFullYear()} Whisky Nights Club. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Redhead WHISKY. All rights reserved.</p>
         </div>
       </footer>
     </div>

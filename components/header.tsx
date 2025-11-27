@@ -33,7 +33,7 @@ export function Header({ user }: HeaderProps) {
         <Link href="/" className="flex items-center gap-2 group">
           <Wine className="h-8 w-8 text-whisky-gold group-hover:scale-110 transition-transform" />
           <h1 className="text-2xl font-serif font-bold text-gradient-gold">
-            Whisky Nights Club
+            Redhead WHISKY
           </h1>
         </Link>
 

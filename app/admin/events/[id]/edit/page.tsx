@@ -90,11 +90,14 @@ export default async function EditEventPage({ params }: { params: { id: string }
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="start_time">Start Time *</Label>
+                  <Label htmlFor="start_time">Start Time (HH:MM) *</Label>
                   <Input
                     id="start_time"
                     name="start_time"
-                    type="time"
+                    type="text"
+                    placeholder="19:00"
+                    pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]"
+                    title="Please enter time in HH:MM format (e.g., 19:00)"
                     defaultValue={event.start_time}
                     required
                   />

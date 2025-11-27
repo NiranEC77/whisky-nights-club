@@ -42,7 +42,7 @@ export default async function LoginPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="admin@whiskyclub.com"
+                  placeholder="admin@redheadwhisky.com"
                   required
                 />
               </div>

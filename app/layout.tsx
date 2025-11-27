@@ -18,8 +18,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Whisky Nights Club - Premium Whisky Tasting Events',
-  description: 'Join us for exclusive whisky tasting events. Experience the finest spirits in an elegant atmosphere.',
+  title: 'Redhead WHISKY - Virtual Whisky Tasting Events',
+  description: 'Join us for exclusive virtual whisky tasting events. Experience the finest spirits from the comfort of home.',
 }
 
 export default async function RootLayout({
