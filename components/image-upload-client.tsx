@@ -24,8 +24,9 @@ export function ImageUploadClient({ name, label, defaultValue }: ImageUploadClie
   // Sync preview with parent form
   useEffect(() => {
     const hiddenInput = document.getElementById(`${name}`) as HTMLInputElement
-    if (hiddenInput && preview) {
-      hiddenInput.value = preview
+    if (hiddenInput) {
+      hiddenInput.value = preview || ''
+      console.log(`Updated hidden input ${name} to:`, preview || '(empty)')
     }
   }, [preview, name])
 

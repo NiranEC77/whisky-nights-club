@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { ImageUploadClient } from '@/components/image-upload-client'
+import { SubmitButton } from '@/components/submit-button'
 import Link from 'next/link'
 
 export default async function NewEventPage() {
@@ -19,21 +20,28 @@ export default async function NewEventPage() {
   async function handleCreateEvent(formData: FormData) {
     'use server'
     
-    console.log('Creating event with formData:', {
-      title: formData.get('title'),
-      date: formData.get('date'),
-      featured_image: formData.get('featured_image'),
-    })
-    
-    const result = await createEvent(formData)
-    
-    if (result.error) {
-      console.error('Error creating event:', result.error)
-      return
+    try {
+      console.log('=== handleCreateEvent called ===')
+      console.log('Form data received:')
+      for (const [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value)
+      }
+      
+      const result = await createEvent(formData)
+      console.log('createEvent result:', result)
+      
+      if (result.error) {
+        console.error('Error creating event:', result.error)
+        // For now, still redirect to show the error happened
+        redirect('/admin?error=' + encodeURIComponent(result.error))
+      }
+      
+      console.log('Event created successfully, redirecting...')
+      redirect('/admin')
+    } catch (error) {
+      console.error('Exception in handleCreateEvent:', error)
+      throw error
     }
-    
-    console.log('Event created successfully:', result.data)
-    redirect('/admin')
   }
 
   return (
@@ -139,9 +147,9 @@ export default async function NewEventPage() {
                     Cancel
                   </Button>
                 </Link>
-                <Button type="submit" className="flex-1">
+                <SubmitButton className="flex-1">
                   Create Event
-                </Button>
+                </SubmitButton>
               </div>
             </form>
           </CardContent>

@@ -75,52 +75,66 @@ export async function getEventById(id: string): Promise<EventWithRegistrations |
 }
 
 export async function createEvent(formData: FormData) {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'Unauthorized' }
-  }
-
-  // Verify user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
-    return { error: 'Unauthorized: Admin access required' }
-  }
-
-  const featuredImage = formData.get('featured_image') as string
+  console.log('=== createEvent function called ===')
   
-  const eventData = {
-    title: formData.get('title') as string,
-    description: formData.get('description') as string,
-    date: formData.get('date') as string,
-    start_time: formData.get('start_time') as string,
-    price: parseInt(formData.get('price') as string),
-    max_seats: parseInt(formData.get('max_seats') as string),
-    featured_image: featuredImage || null,
-    created_by: user.id,
+  try {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    console.log('User:', user?.id)
+
+    if (!user) {
+      return { error: 'Unauthorized' }
+    }
+
+    // Verify user is admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    console.log('Profile role:', profile?.role)
+
+    if (profile?.role !== 'admin') {
+      return { error: 'Unauthorized: Admin access required' }
+    }
+
+    const featuredImage = formData.get('featured_image') as string
+    
+    const eventData = {
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      date: formData.get('date') as string,
+      start_time: formData.get('start_time') as string,
+      price: parseInt(formData.get('price') as string),
+      max_seats: parseInt(formData.get('max_seats') as string),
+      featured_image: featuredImage || null,
+      created_by: user.id,
+    }
+
+    console.log('Event data to insert:', eventData)
+
+    const { data, error } = await supabase
+      .from('events')
+      .insert(eventData)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase insert error:', error)
+      return { error: error.message }
+    }
+
+    console.log('Event inserted successfully:', data)
+
+    revalidatePath('/')
+    revalidatePath('/admin')
+    return { data }
+  } catch (error) {
+    console.error('Exception in createEvent:', error)
+    return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
-
-  const { data, error } = await supabase
-    .from('events')
-    .insert(eventData)
-    .select()
-    .single()
-
-  if (error) {
-    console.error('Error creating event:', error)
-    return { error: error.message }
-  }
-
-  revalidatePath('/')
-  revalidatePath('/admin')
-  return { data }
 }
 
 export async function updateEvent(id: string, formData: FormData) {
