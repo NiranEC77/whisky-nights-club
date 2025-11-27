@@ -38,12 +38,19 @@ export default async function AdminDashboard() {
               Manage your events and registrations
             </p>
           </div>
-          <Link href="/admin/events/new">
-            <Button size="lg" className="gap-2">
-              <Plus className="h-5 w-5" />
-              Create Event
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/admin/users">
+              <Button size="lg" variant="outline" className="gap-2">
+                Manage Users
+              </Button>
+            </Link>
+            <Link href="/admin/events/new">
+              <Button size="lg" className="gap-2">
+                <Plus className="h-5 w-5" />
+                Create Event
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}

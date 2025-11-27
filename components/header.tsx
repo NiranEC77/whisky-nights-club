@@ -60,10 +60,18 @@ export function Header({ user }: HeaderProps) {
             <>
               <Link href="/admin">
                 <Button
-                  variant={pathname.startsWith('/admin') ? 'default' : 'ghost'}
+                  variant={pathname === '/admin' ? 'default' : 'ghost'}
                   className="text-sm"
                 >
-                  Admin Dashboard
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/admin/users">
+                <Button
+                  variant={pathname === '/admin/users' ? 'default' : 'ghost'}
+                  className="text-sm"
+                >
+                  Users
                 </Button>
               </Link>
             </>
