@@ -10,7 +10,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-32 px-4 overflow-hidden min-h-[600px] flex items-center">
+      <section className="relative py-24 px-4 overflow-hidden min-h-[600px] flex items-start pt-32">
         {/* Featured Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center" 
@@ -20,10 +20,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-whisky-dark/80 via-whisky-dark/70 to-whisky-dark/90" />
         
         <div className="container mx-auto relative z-10">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="flex justify-center mb-6">
-              <Wine className="h-20 w-20 text-whisky-gold animate-fade-in" />
-            </div>
+          <div className="max-w-3xl mx-auto text-center space-y-4">
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg">
               Join the Club
             </h1>
