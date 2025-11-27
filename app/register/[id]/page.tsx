@@ -2,18 +2,14 @@ import { notFound, redirect } from 'next/navigation'
 import { getEventById } from '@/lib/actions/events'
 import { createRegistration } from '@/lib/actions/registrations'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { formatDate, formatCurrency } from '@/lib/utils'
+import { RegistrationFormClient } from '@/components/registration-form-client'
 
 export const dynamic = 'force-dynamic'
 
-export default async function RegisterPage({ 
+export default async function RegisterPage({
   params,
-  searchParams 
-}: { 
+  searchParams
+}: {
   params: { id: string }
   searchParams: { error?: string }
 }) {
@@ -29,15 +25,15 @@ export default async function RegisterPage({
 
   async function handleRegistration(formData: FormData) {
     'use server'
-    
+
     const result = await createRegistration(formData)
-    
+
     if (result.error) {
       console.error('Registration error:', result.error)
       // Redirect back with error message
       redirect(`/register/${params.id}?error=${encodeURIComponent(result.error)}`)
     }
-    
+
     if (result.data) {
       redirect(`/success/${params.id}?registration=${result.data.id}`)
     }
@@ -71,99 +67,7 @@ export default async function RegisterPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={handleRegistration} className="space-y-6" id="registration-form">
-              <input type="hidden" name="event_id" value={event.id} />
-
-              <div className="space-y-2">
-                <Label htmlFor="ticket_count">How many people registering? *</Label>
-                <Select name="ticket_count" defaultValue="1" required>
-                  <SelectTrigger id="ticket_count">
-                    <SelectValue placeholder="Select number" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">one is fun - {formatCurrency(event.price)}</SelectItem>
-                    <SelectItem value="2" disabled={event.available_seats < 2}>
-                      two is charm - {formatCurrency(event.price * 2)}
-                      {event.available_seats < 2 && ' (Not enough seats)'}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-whisky-cream/60">
-                  {event.available_seats} seat(s) available
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name *</Label>
-                <Input
-                  id="full_name"
-                  name="full_name"
-                  placeholder="John Smith"
-                  required
-                  minLength={2}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="(555) 123-4567"
-                  required
-                  minLength={10}
-                />
-              </div>
-
-              <div className="border-t border-whisky-gold/20 pt-6 space-y-3">
-                <h3 className="font-semibold text-lg">Event Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-whisky-cream/60">Event</span>
-                    <span>{event.title}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-whisky-cream/60">Date</span>
-                    <span>{formatDate(event.date)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-whisky-cream/60">Time</span>
-                    <span>{event.start_time}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-whisky-cream/60">Price per Ticket</span>
-                    <span>{formatCurrency(event.price)}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-base pt-2 border-t border-whisky-gold/20">
-                    <span>Total</span>
-                    <span className="text-whisky-gold" id="total-amount">
-                      {formatCurrency(event.price)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" size="lg">
-                Complete Registration
-              </Button>
-
-              <p className="text-xs text-center text-whisky-cream/60">
-                By registering, you agree to receive payment instructions.
-                Your spot will be reserved upon payment confirmation.
-              </p>
-            </form>
+            <RegistrationFormClient event={event} onSubmit={handleRegistration} />
           </CardContent>
         </Card>
       </div>

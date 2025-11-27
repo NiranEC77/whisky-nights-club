@@ -3,7 +3,7 @@ import { getEventById } from '@/lib/actions/events'
 import { getRegistrationById } from '@/lib/actions/registrations'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CopyButton } from '@/components/copy-button'
+import { PaymentInstructions } from '@/components/payment-instructions'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
@@ -23,14 +23,13 @@ export default async function SuccessPage({
     notFound()
   }
 
-  // Get registration details to show correct ticket count and total
+  // Get registration details to show correct ticket count, payment method, and membership status
   const registration = searchParams.registration ? await getRegistrationById(searchParams.registration) : null
   const ticketCount = registration?.ticket_count || 1
   const totalAmount = event.price * ticketCount
-
-  const zelleEmail = process.env.NEXT_PUBLIC_ZELLE_EMAIL || 'payments@whiskyclub.com'
-  const zellePhone = process.env.NEXT_PUBLIC_ZELLE_PHONE || ''
-  const memo = `EVENT-${params.id.slice(0, 8).toUpperCase()}-${searchParams.registration?.slice(0, 8).toUpperCase()}`
+  const paymentMethod = registration?.payment_method || 'zelle'
+  const isFreeWithMembership = registration?.is_free_with_membership || false
+  const memo = `EVENT-${searchParams.registration?.slice(0, 8).toUpperCase()}`
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -45,94 +44,72 @@ export default async function SuccessPage({
           </p>
         </div>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Payment Instructions</CardTitle>
-            <CardDescription>
-              Please complete your payment via Zelle to confirm your registration
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-whisky-darker/80 rounded-lg p-6 space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm text-whisky-cream/60">Amount to Pay</p>
-                <p className="text-3xl font-bold text-whisky-gold">
-                  {formatCurrency(totalAmount)}
+        {isFreeWithMembership ? (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-green-400">✅ Membership Benefit Applied</CardTitle>
+              <CardDescription>
+                This event is FREE as part of your yearly membership!
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-green-300 mb-2">You&apos;re All Set! 🎉</h3>
+                <p className="text-whisky-cream/80">
+                  No payment required. Your registration is confirmed and you&apos;re ready to go!
                 </p>
-                {ticketCount > 1 && (
-                  <p className="text-xs text-whisky-cream/60">
-                    {ticketCount} tickets × {formatCurrency(event.price)} each
-                  </p>
-                )}
-              </div>
-
-              <div className="border-t border-whisky-gold/20 pt-4 space-y-3">
-                {zelleEmail && (
-                  <div className="space-y-1">
-                    <p className="text-sm text-whisky-cream/60">Zelle Email</p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                        {zelleEmail}
-                      </code>
-                      <CopyButton text={zelleEmail} />
-                    </div>
+                <div className="mt-4 pt-4 border-t border-green-500/30 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Event</span>
+                    <span className="text-whisky-cream">{event.title}</span>
                   </div>
-                )}
-
-                {zellePhone && (
-                  <div className="space-y-1">
-                    <p className="text-sm text-whisky-cream/60">Zelle Phone</p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                        {zellePhone}
-                      </code>
-                      <CopyButton text={zellePhone} />
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Date</span>
+                    <span className="text-whisky-cream">{new Date(event.date).toLocaleDateString()}</span>
                   </div>
-                )}
-
-                <div className="space-y-1">
-                  <p className="text-sm text-whisky-cream/60">Memo / Note (Required)</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                      {memo}
-                    </code>
-                    <CopyButton text={memo} />
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Time</span>
+                    <span className="text-whisky-cream">{event.start_time}</span>
                   </div>
-                  <p className="text-xs text-whisky-cream/60 mt-2">
-                    ⚠️ Please include this memo in your Zelle payment to help us identify your registration
-                  </p>
+                  <div className="flex justify-between">
+                    <span className="text-whisky-cream/60">Tickets</span>
+                    <span className="text-whisky-cream">{ticketCount}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span className="text-whisky-cream/60">Price</span>
+                    <span className="text-green-400">FREE with Membership</span>
+                  </div>
                 </div>
               </div>
-            </div>
+              <p className="text-sm text-whisky-cream/70">
+                We&apos;re looking forward to seeing you there! A confirmation email has been sent to your inbox.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Payment Instructions</CardTitle>
+              <CardDescription>
+                Please complete your payment to confirm your registration
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <PaymentInstructions
+                paymentMethod={paymentMethod}
+                amount={totalAmount}
+                memo={memo}
+              />
 
-            <div className="space-y-3 text-sm text-whisky-cream/70">
-              <p className="flex items-start gap-2">
-                <span className="text-whisky-gold mt-1">1.</span>
-                <span>Open your Zelle app or your banking app with Zelle integration</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-whisky-gold mt-1">2.</span>
-                <span>Send {formatCurrency(totalAmount)} to the email/phone above</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-whisky-gold mt-1">3.</span>
-                <span>Include the memo exactly as shown above</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-whisky-gold mt-1">4.</span>
-                <span>You&apos;ll receive a confirmation email within 24 hours of payment</span>
-              </p>
-            </div>
-
-            <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
-              <p className="text-sm text-whisky-cream/80">
-                <strong>Looking forward to tasting together!</strong> Your registration is pending until payment is confirmed.
-                Questions? Reach out at {zelleEmail}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
+                <p className="text-sm text-whisky-cream/80">
+                  <strong>Looking forward to tasting together!</strong> Your registration is pending until payment is confirmed.
+                  You&apos;ll receive a confirmation email within 24 hours of payment.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex gap-4">
           <Link href="/" className="flex-1">
@@ -150,4 +127,3 @@ export default async function SuccessPage({
     </div>
   )
 }
-

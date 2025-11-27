@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { revalidatePath } from 'next/cache'
 import { sendRegistrationEmail, sendPaymentConfirmation } from '@/lib/email'
+import { getActiveMembershipByEmail, useMembershipEvent } from './memberships'
+import { PaymentMethod } from '@/lib/types'
 
 export async function createRegistration(formData: FormData) {
   // Use service client for public registration (no auth needed)
@@ -14,11 +16,22 @@ export async function createRegistration(formData: FormData) {
   const email = formData.get('email') as string
   const phone = formData.get('phone') as string
   const ticketCount = parseInt(formData.get('ticket_count') as string) || 1
+  const paymentMethod = (formData.get('payment_method') as PaymentMethod) || 'zelle'
 
   // Validate ticket count
   if (ticketCount < 1 || ticketCount > 2) {
     return { error: 'Ticket count must be 1 or 2' }
   }
+
+  // Validate payment method
+  if (!['venmo', 'paypal', 'zelle', 'googlepay'].includes(paymentMethod)) {
+    return { error: 'Invalid payment method' }
+  }
+
+  // Check for active membership
+  const activeMembership = await getActiveMembershipByEmail(email)
+  const isFreeWithMembership = activeMembership !== null
+  const membershipId = activeMembership?.id || null
 
   // Get event details (need full info for email)
   const { data: event } = await supabase
@@ -34,7 +47,7 @@ export async function createRegistration(formData: FormData) {
   // Calculate total tickets registered
   const totalTicketsRegistered = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
   const availableSeats = event.max_seats - totalTicketsRegistered
-  
+
   if (availableSeats < ticketCount) {
     return { error: `Not enough seats available. Only ${availableSeats} seat(s) remaining.` }
   }
@@ -59,7 +72,10 @@ export async function createRegistration(formData: FormData) {
       email,
       phone,
       ticket_count: ticketCount,
-      payment_status: 'pending',
+      payment_status: isFreeWithMembership ? 'paid' : 'pending',
+      payment_method: paymentMethod,
+      membership_id: membershipId,
+      is_free_with_membership: isFreeWithMembership,
     })
     .select()
     .single()
@@ -69,12 +85,21 @@ export async function createRegistration(formData: FormData) {
     return { error: error.message }
   }
 
+  // If using membership, increment events_used counter
+  if (isFreeWithMembership && membershipId) {
+    const result = await useMembershipEvent(membershipId)
+    if (result.error) {
+      console.error('Error updating membership:', result.error)
+      // Don't fail the registration, but log the error
+    }
+  }
+
   // Send confirmation email
   console.log('=== Attempting to send registration confirmation email ===')
   console.log('Recipient:', email)
   console.log('RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY)
   console.log('EMAIL_FROM:', process.env.EMAIL_FROM || 'NOT SET')
-  
+
   const emailResult = await sendRegistrationEmail({
     to: email,
     eventTitle: event.title,
@@ -83,8 +108,8 @@ export async function createRegistration(formData: FormData) {
     eventPrice: event.price,
     ticketCount,
     attendeeName: fullName,
-    zelleEmail: process.env.NEXT_PUBLIC_ZELLE_EMAIL || '',
-    zellePhone: process.env.NEXT_PUBLIC_ZELLE_PHONE,
+    paymentMethod,
+    isFreeWithMembership,
     registrationId: data.id,
   })
 

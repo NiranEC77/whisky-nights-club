@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { PaymentMethod } from './types'
 
 // Lazy initialization - only create when needed (not at build time)
 let resendClient: Resend | null = null
@@ -17,6 +18,70 @@ function getResendClient() {
   return resendClient
 }
 
+interface PaymentDetails {
+  venmo?: string
+  paypal?: string
+  zelle?: { email: string; phone?: string }
+  googlepay?: { email?: string; phone?: string }
+}
+
+function getPaymentDetails(): PaymentDetails {
+  return {
+    venmo: process.env.NEXT_PUBLIC_VENMO_USERNAME,
+    paypal: process.env.NEXT_PUBLIC_PAYPAL_EMAIL,
+    zelle: {
+      email: process.env.NEXT_PUBLIC_ZELLE_EMAIL || '',
+      phone: process.env.NEXT_PUBLIC_ZELLE_PHONE,
+    },
+    googlepay: {
+      email: process.env.NEXT_PUBLIC_GOOGLEPAY_EMAIL,
+      phone: process.env.NEXT_PUBLIC_GOOGLEPAY_PHONE,
+    },
+  }
+}
+
+function getPaymentInstructions(method: PaymentMethod, amount: number, memo: string): string {
+  const details = getPaymentDetails()
+
+  switch (method) {
+    case 'venmo':
+      return `
+        <h2>💳 Payment Instructions</h2>
+        <p>To complete your registration, please send payment via <strong>Venmo</strong>:</p>
+        <p><strong>Send to:</strong> ${details.venmo || 'Not configured'}</p>
+        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
+        <p><strong>Memo/Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+      `
+    case 'paypal':
+      return `
+        <h2>💳 Payment Instructions</h2>
+        <p>To complete your registration, please send payment via <strong>PayPal</strong>:</p>
+        <p><strong>Send to:</strong> ${details.paypal || 'Not configured'}</p>
+        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
+        <p><strong>Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+      `
+    case 'googlepay':
+      return `
+        <h2>💳 Payment Instructions</h2>
+        <p>To complete your registration, please send payment via <strong>Google Pay</strong>:</p>
+        ${details.googlepay?.email ? `<p><strong>Email:</strong> ${details.googlepay.email}</p>` : ''}
+        ${details.googlepay?.phone ? `<p><strong>Phone:</strong> ${details.googlepay.phone}</p>` : ''}
+        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
+        <p><strong>Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+      `
+    case 'zelle':
+    default:
+      return `
+        <h2>💳 Payment Instructions</h2>
+        <p>To complete your registration, please send payment via <strong>Zelle</strong>:</p>
+        <p><strong>Send to:</strong> ${details.zelle?.email}</p>
+        ${details.zelle?.phone ? `<p><strong>Phone:</strong> ${details.zelle.phone}</p>` : ''}
+        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
+        <p><strong>Memo/Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+      `
+  }
+}
+
 interface SendRegistrationEmailProps {
   to: string
   eventTitle: string
@@ -25,8 +90,8 @@ interface SendRegistrationEmailProps {
   eventPrice: number
   ticketCount: number
   attendeeName: string
-  zelleEmail: string
-  zellePhone?: string
+  paymentMethod: PaymentMethod
+  isFreeWithMembership: boolean
   registrationId: string
 }
 
@@ -38,26 +103,28 @@ export async function sendRegistrationEmail({
   eventPrice,
   ticketCount,
   attendeeName,
-  zelleEmail,
-  zellePhone,
+  paymentMethod,
+  isFreeWithMembership,
   registrationId,
 }: SendRegistrationEmailProps) {
   console.log('📧 sendRegistrationEmail called')
   console.log('To:', to)
   console.log('Event:', eventTitle)
-  
+  console.log('Free with membership:', isFreeWithMembership)
+
   const resend = getResendClient()
-  
+
   if (!resend) {
     console.error('❌ Resend not configured, skipping email send')
     return { error: 'Email service not configured' }
   }
-  
+
   const totalPrice = eventPrice * ticketCount
   const ticketWord = ticketCount === 1 ? 'ticket' : 'tickets'
-  
+  const memo = `EVENT-${registrationId.substring(0, 8)}`
+
   console.log('📤 Attempting to send via Resend API...')
-  
+
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'Redhead Whiskey <events@redheadwhiskey.com>',
@@ -102,6 +169,13 @@ export async function sendRegistrationEmail({
       margin: 20px 0;
       border: 2px solid #C6A667;
     }
+    .free-box {
+      background: #e8f5e9;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 2px solid #4caf50;
+    }
     .highlight {
       color: #C6A667;
       font-weight: bold;
@@ -144,24 +218,30 @@ export async function sendRegistrationEmail({
       <p><strong>Date:</strong> ${new Date(eventDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       <p><strong>Time:</strong> ${eventTime}</p>
       <p><strong>Tickets:</strong> ${ticketCount} ${ticketWord}</p>
-      <p><strong>Total Amount:</strong> <span class="highlight">$${totalPrice.toFixed(2)}</span></p>
+      ${isFreeWithMembership
+          ? '<p><strong>Price:</strong> <span style="color: #4caf50; font-weight: bold;">FREE with Membership! 🎉</span></p>'
+          : `<p><strong>Total Amount:</strong> <span class="highlight">$${totalPrice.toFixed(2)}</span></p>`
+        }
     </div>
     
-    <div class="payment-box">
-      <h2>💳 Payment Instructions</h2>
-      <p>To complete your registration, please send payment via <strong>Zelle</strong>:</p>
-      
-      <p><strong>Send to:</strong> ${zelleEmail}</p>
-      ${zellePhone ? `<p><strong>Phone:</strong> ${zellePhone}</p>` : ''}
-      <p><strong>Amount:</strong> <span class="highlight">$${totalPrice.toFixed(2)}</span></p>
-      <p><strong>Memo/Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">EVENT-${registrationId.substring(0, 8)}</code></p>
-      
-      <p style="margin-top: 20px; font-size: 14px; color: #666;">
-        ⚠️ <em>Important:</em> Please include the memo/note so we can match your payment to your registration.
-      </p>
-    </div>
-    
-    <p>Once we confirm your payment, you'll be all set! We'll send you a confirmation email.</p>
+    ${isFreeWithMembership
+          ? `
+      <div class="free-box">
+        <h2 style="color: #4caf50;">✅ Membership Benefit Applied</h2>
+        <p>This event is <strong>FREE</strong> as part of your yearly membership! No payment required.</p>
+        <p>You're all confirmed and ready to go. See you there!</p>
+      </div>
+      `
+          : `
+      <div class="payment-box">
+        ${getPaymentInstructions(paymentMethod, totalPrice, memo)}
+        <p style="margin-top: 20px; font-size: 14px; color: #666;">
+          ⚠️ <em>Important:</em> Please include the memo/note so we can match your payment to your registration.
+        </p>
+      </div>
+      <p>Once we confirm your payment, you'll be all set! We'll send you a confirmation email.</p>
+      `
+        }
     
     <p style="margin-top: 30px;">Looking forward to tasting together!</p>
     
@@ -209,12 +289,12 @@ export async function sendPaymentConfirmation({
   eventTime,
 }: SendPaymentConfirmationProps) {
   const resend = getResendClient()
-  
+
   if (!resend) {
     console.log('Resend not configured, skipping payment confirmation email')
     return { error: 'Email service not configured' }
   }
-  
+
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'Redhead Whiskey <events@redheadwhiskey.com>',
