@@ -70,7 +70,11 @@ export async function createRegistration(formData: FormData) {
   }
 
   // Send confirmation email
-  console.log('Sending registration confirmation email to:', email)
+  console.log('=== Attempting to send registration confirmation email ===')
+  console.log('Recipient:', email)
+  console.log('RESEND_API_KEY configured:', !!process.env.RESEND_API_KEY)
+  console.log('EMAIL_FROM:', process.env.EMAIL_FROM || 'NOT SET')
+  
   const emailResult = await sendRegistrationEmail({
     to: email,
     eventTitle: event.title,
@@ -85,10 +89,10 @@ export async function createRegistration(formData: FormData) {
   })
 
   if (emailResult.error) {
-    console.error('Failed to send confirmation email:', emailResult.error)
+    console.error('❌ Failed to send confirmation email:', emailResult.error)
     // Don't fail the registration if email fails
   } else {
-    console.log('Confirmation email sent successfully')
+    console.log('✅ Confirmation email sent successfully, Message ID:', emailResult.messageId)
   }
 
   revalidatePath(`/event/${eventId}`)

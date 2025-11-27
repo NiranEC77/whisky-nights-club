@@ -7,9 +7,11 @@ function getResendClient() {
   if (!resendClient) {
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) {
-      console.warn('RESEND_API_KEY not configured - emails will not be sent')
+      console.warn('⚠️  RESEND_API_KEY not configured - emails will not be sent')
+      console.warn('Available env vars:', Object.keys(process.env).filter(k => k.includes('RESEND') || k.includes('EMAIL')))
       return null
     }
+    console.log('✅ Resend client initialized with API key')
     resendClient = new Resend(apiKey)
   }
   return resendClient
@@ -40,15 +42,21 @@ export async function sendRegistrationEmail({
   zellePhone,
   registrationId,
 }: SendRegistrationEmailProps) {
+  console.log('📧 sendRegistrationEmail called')
+  console.log('To:', to)
+  console.log('Event:', eventTitle)
+  
   const resend = getResendClient()
   
   if (!resend) {
-    console.log('Resend not configured, skipping email send')
+    console.error('❌ Resend not configured, skipping email send')
     return { error: 'Email service not configured' }
   }
   
   const totalPrice = eventPrice * ticketCount
   const ticketWord = ticketCount === 1 ? 'ticket' : 'tickets'
+  
+  console.log('📤 Attempting to send via Resend API...')
   
   try {
     const { data, error } = await resend.emails.send({
