@@ -44,7 +44,7 @@ export default async function MembershipSuccessPage({
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <PaymentInstructions
-                            paymentMethod={membership.payment_method || 'zelle'}
+                            paymentMethod={membership.payment_method || 'stripe'}
                             amount={membershipPrice}
                             memo={memo}
                         />
