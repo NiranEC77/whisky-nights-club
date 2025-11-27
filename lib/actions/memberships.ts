@@ -47,10 +47,10 @@ export async function createMembership(formData: FormData) {
     // Check if payment code is valid (for testing)
     const isTestPayment = paymentCode === 'CHEAT'
 
-    // Calculate membership dates (1 year from today)
-    const startDate = new Date()
-    const endDate = new Date()
-    endDate.setFullYear(endDate.getFullYear() + 1)
+    // Calculate membership dates (current calendar year)
+    const now = new Date()
+    const startDate = new Date(now.getFullYear(), 0, 1) // January 1st of current year
+    const endDate = new Date(now.getFullYear(), 11, 31) // December 31st of current year
 
     const { data, error } = await supabase
         .from('memberships')
