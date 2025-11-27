@@ -149,6 +149,18 @@ export default async function MembershipPage({
 
                                 <PaymentMethodSelector />
 
+                                <div className="space-y-2">
+                                    <Label htmlFor="payment_code">Payment Code (Optional)</Label>
+                                    <Input
+                                        id="payment_code"
+                                        name="payment_code"
+                                        placeholder="Enter code if you have one"
+                                    />
+                                    <p className="text-xs text-whisky-cream/60">
+                                        For testing purposes only
+                                    </p>
+                                </div>
+
                                 <Button type="submit" className="w-full" size="lg">
                                     Purchase Membership - ${membershipPrice}
                                 </Button>
