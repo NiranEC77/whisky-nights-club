@@ -18,7 +18,7 @@ export async function getEvents(): Promise<EventWithRegistrations[]> {
       )
     `)
     .gte('date', new Date().toISOString().split('T')[0])
-    .order('date', { ascending: true })
+    .order('created_at', { ascending: false })
 
   if (error) {
     console.error('Error fetching events:', error)
@@ -76,7 +76,7 @@ export async function getEventById(id: string): Promise<EventWithRegistrations |
 
 export async function createEvent(formData: FormData) {
   console.log('=== createEvent function called ===')
-  
+
   try {
     const supabase = await createClient()
 
@@ -101,7 +101,7 @@ export async function createEvent(formData: FormData) {
     }
 
     const featuredImage = formData.get('featured_image') as string
-    
+
     const eventData = {
       title: formData.get('title') as string,
       description: formData.get('description') as string,
@@ -158,7 +158,7 @@ export async function updateEvent(id: string, formData: FormData) {
   }
 
   const featuredImage = formData.get('featured_image') as string
-  
+
   const eventData = {
     title: formData.get('title') as string,
     description: formData.get('description') as string,
