@@ -81,9 +81,9 @@ export default async function RegisterPage({
                     <SelectValue placeholder="Select number" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">One is fun - {formatCurrency(event.price)}</SelectItem>
+                    <SelectItem value="1">one is fun - {formatCurrency(event.price)}</SelectItem>
                     <SelectItem value="2" disabled={event.available_seats < 2}>
-                      Two is charm - {formatCurrency(event.price * 2)}
+                      two is charm - {formatCurrency(event.price * 2)}
                       {event.available_seats < 2 && ' (Not enough seats)'}
                     </SelectItem>
                   </SelectContent>

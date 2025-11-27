@@ -20,13 +20,13 @@ export default async function HomePage() {
               <Wine className="h-20 w-20 text-whisky-gold animate-fade-in" />
             </div>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in">
-              Redhead WHISKY
+              Join the Club
             </h1>
             <p className="text-xl md:text-2xl text-whisky-cream/80 animate-fade-in">
-              Bringing people together through good drinks, delicious food, and great conversation
+              Bringing people together through good drinks, delicious food, engaging company and great conversation
             </p>
-            <p className="text-lg text-whisky-cream/60 animate-fade-in">
-              Join our virtual whisky club experiences
+            <p className="text-lg text-whisky-cream/70 italic animate-fade-in">
+              It&apos;s about the togetherness.
             </p>
           </div>
         </div>
@@ -39,28 +39,28 @@ export default async function HomePage() {
             <div className="text-center space-y-3 animate-fade-in">
               <Wine className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                Virtual Tastings
+                Curated Experiences
               </h3>
               <p className="text-whisky-cream/70">
-                Join from anywhere and taste together as a community
+                Expertly selected whiskey tastings and distillery tours
               </p>
             </div>
             <div className="text-center space-y-3 animate-fade-in">
               <Users className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                The Togetherness
+                Community First
               </h3>
               <p className="text-whisky-cream/70">
-                Building community through shared whisky experiences
+                Building connections through shared experiences and great conversation
               </p>
             </div>
             <div className="text-center space-y-3 animate-fade-in">
               <Calendar className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                Regular Meetups
+                Club Events
               </h3>
               <p className="text-whisky-cream/70">
-                Join our club events and discover new favorites together
+                Regular tastings and special events for our whiskey community
               </p>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="border-t border-whisky-gold/20 py-8 px-4 mt-16">
         <div className="container mx-auto text-center text-whisky-cream/60">
-          <p>&copy; {new Date().getFullYear()} Redhead WHISKY. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Redhead Whiskey. All rights reserved.</p>
         </div>
       </footer>
     </div>

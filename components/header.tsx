@@ -30,29 +30,33 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header className="border-b border-whisky-gold/20 bg-whisky-darker/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative h-12 w-12 group-hover:scale-110 transition-transform">
-            <Image 
-              src="/images/logo.png" 
-              alt="Redhead WHISKY Logo" 
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-          <h1 className="text-2xl font-serif font-bold text-gradient-gold">
-            Redhead WHISKY
-          </h1>
-        </Link>
+      <div className="container mx-auto px-4 py-6">
+        {/* Centered Logo and Branding */}
+        <div className="flex flex-col items-center mb-4">
+          <Link href="/" className="flex flex-col items-center gap-3 group">
+            <div className="relative h-20 w-20 group-hover:scale-105 transition-transform">
+              <Image 
+                src="/images/logo.png" 
+                alt="Redhead Whiskey Logo" 
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <h1 className="text-3xl font-serif font-bold text-gradient-gold">
+              Redhead Whiskey
+            </h1>
+          </Link>
+        </div>
 
-        <nav className="flex items-center gap-4">
+        {/* Centered Navigation */}
+        <nav className="flex items-center justify-center gap-4 flex-wrap">
           <Link href="/">
             <Button
               variant={pathname === '/' ? 'default' : 'ghost'}
               className="text-sm"
             >
-              Events
+              Home
             </Button>
           </Link>
 
@@ -79,7 +83,7 @@ export function Header({ user }: HeaderProps) {
 
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm text-whisky-cream/70">
+              <span className="text-sm text-whisky-cream/70 hidden sm:inline">
                 {user.email}
               </span>
               <Button
@@ -94,7 +98,7 @@ export function Header({ user }: HeaderProps) {
             </div>
           ) : (
             <Link href="/login">
-              <Button variant="outline" size="sm">
+              <Button variant="ghost" size="sm">
                 Admin Login
               </Button>
             </Link>

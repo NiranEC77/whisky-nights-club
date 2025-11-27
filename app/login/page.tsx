@@ -24,10 +24,10 @@ export default async function LoginPage({
         <div className="text-center mb-8">
           <Wine className="h-12 w-12 text-whisky-gold mx-auto mb-4" />
           <h1 className="text-3xl font-serif font-bold text-gradient-gold mb-2">
-            Admin Login
+            Admin Sign In
           </h1>
           <p className="text-whisky-cream/70">
-            Sign in to manage events and registrations
+            Manage your whiskey club events
           </p>
         </div>
 
@@ -50,13 +50,13 @@ export default async function LoginPage({
             <form action={signIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="admin@redheadwhisky.com"
-                  required
-                />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="admin@redheadwhiskey.com"
+                    required
+                  />
               </div>
 
               <div className="space-y-2">

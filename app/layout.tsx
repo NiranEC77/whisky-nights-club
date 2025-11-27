@@ -18,8 +18,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Redhead WHISKY - Virtual Whisky Club & Tasting Events',
-  description: 'Bringing people together through good drinks and great conversation. Join our virtual whisky club experiences.',
+  title: 'Redhead Whiskey - Bringing People Together',
+  description: 'Bringing people together through good drinks, delicious food, engaging company and great conversation. It\'s about the togetherness.',
 }
 
 export default async function RootLayout({
