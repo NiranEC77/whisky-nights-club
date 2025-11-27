@@ -8,50 +8,10 @@ interface PaymentInstructionsProps {
 }
 
 export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInstructionsProps) {
-    const venmoUsername = process.env.NEXT_PUBLIC_VENMO_USERNAME
     const paypalEmail = process.env.NEXT_PUBLIC_PAYPAL_EMAIL
-    const zelleEmail = process.env.NEXT_PUBLIC_ZELLE_EMAIL
-    const zellePhone = process.env.NEXT_PUBLIC_ZELLE_PHONE
-    const googlepayEmail = process.env.NEXT_PUBLIC_GOOGLEPAY_EMAIL
-    const googlepayPhone = process.env.NEXT_PUBLIC_GOOGLEPAY_PHONE
 
     const renderInstructions = () => {
         switch (paymentMethod) {
-            case 'venmo':
-                return (
-                    <>
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <p className="text-sm text-whisky-cream/60">Venmo Username</p>
-                                <div className="flex items-center gap-2">
-                                    <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                                        {venmoUsername || 'Not configured'}
-                                    </code>
-                                    {venmoUsername && <CopyButton text={venmoUsername} />}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="space-y-3 text-sm text-whisky-cream/70 mt-4">
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">1.</span>
-                                <span>Open the Venmo app</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">2.</span>
-                                <span>Search for {venmoUsername}</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">3.</span>
-                                <span>Send ${amount.toFixed(2)}</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">4.</span>
-                                <span>Include the memo: {memo}</span>
-                            </p>
-                        </div>
-                    </>
-                )
-
             case 'paypal':
                 return (
                     <>
@@ -87,98 +47,26 @@ export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInst
                     </>
                 )
 
-            case 'googlepay':
-                return (
-                    <>
-                        <div className="space-y-3">
-                            {googlepayEmail && (
-                                <div className="space-y-1">
-                                    <p className="text-sm text-whisky-cream/60">Google Pay Email</p>
-                                    <div className="flex items-center gap-2">
-                                        <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                                            {googlepayEmail}
-                                        </code>
-                                        <CopyButton text={googlepayEmail} />
-                                    </div>
-                                </div>
-                            )}
-                            {googlepayPhone && (
-                                <div className="space-y-1">
-                                    <p className="text-sm text-whisky-cream/60">Google Pay Phone</p>
-                                    <div className="flex items-center gap-2">
-                                        <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                                            {googlepayPhone}
-                                        </code>
-                                        <CopyButton text={googlepayPhone} />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        <div className="space-y-3 text-sm text-whisky-cream/70 mt-4">
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">1.</span>
-                                <span>Open Google Pay app</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">2.</span>
-                                <span>Tap &quot;New Payment&quot;</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">3.</span>
-                                <span>Send ${amount.toFixed(2)} to the email/phone above</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-whisky-gold mt-1">4.</span>
-                                <span>Include the note: {memo}</span>
-                            </p>
-                        </div>
-                    </>
-                )
-
-            case 'zelle':
+            case 'stripe':
             default:
                 return (
                     <>
-                        <div className="space-y-3">
-                            {zelleEmail && (
-                                <div className="space-y-1">
-                                    <p className="text-sm text-whisky-cream/60">Zelle Email</p>
-                                    <div className="flex items-center gap-2">
-                                        <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                                            {zelleEmail}
-                                        </code>
-                                        <CopyButton text={zelleEmail} />
-                                    </div>
-                                </div>
-                            )}
-                            {zellePhone && (
-                                <div className="space-y-1">
-                                    <p className="text-sm text-whisky-cream/60">Zelle Phone</p>
-                                    <div className="flex items-center gap-2">
-                                        <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
-                                            {zellePhone}
-                                        </code>
-                                        <CopyButton text={zellePhone} />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        <div className="space-y-3 text-sm text-whisky-cream/70 mt-4">
+                        <div className="space-y-3 text-sm text-whisky-cream/70">
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">1.</span>
-                                <span>Open your Zelle app or your banking app with Zelle integration</span>
+                                <span>You will receive a Stripe payment link via email</span>
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">2.</span>
-                                <span>Send ${amount.toFixed(2)} to the email/phone above</span>
+                                <span>Click the link to securely pay with credit/debit card</span>
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">3.</span>
-                                <span>Include the memo exactly as shown above</span>
+                                <span>Payment amount: ${amount.toFixed(2)}</span>
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">4.</span>
-                                <span>You&apos;ll receive a confirmation email within 24 hours of payment</span>
+                                <span>You&apos;ll receive confirmation once payment is processed</span>
                             </p>
                         </div>
                     </>
@@ -199,7 +87,7 @@ export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInst
                 {renderInstructions()}
 
                 <div className="space-y-1 mt-4">
-                    <p className="text-sm text-whisky-cream/60">Memo / Note (Required)</p>
+                    <p className="text-sm text-whisky-cream/60">Reference / Memo (Required)</p>
                     <div className="flex items-center gap-2">
                         <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
                             {memo}
@@ -207,7 +95,7 @@ export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInst
                         <CopyButton text={memo} />
                     </div>
                     <p className="text-xs text-whisky-cream/60 mt-2">
-                        ⚠️ Please include this memo in your payment to help us identify your registration
+                        ⚠️ Please include this reference in your payment to help us identify your {paymentMethod === 'stripe' ? 'transaction' : 'payment'}
                     </p>
                 </div>
             </div>
