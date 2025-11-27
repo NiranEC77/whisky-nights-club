@@ -1,6 +1,19 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization - only create when needed (not at build time)
+let resendClient: Resend | null = null
+
+function getResendClient() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      console.warn('RESEND_API_KEY not configured - emails will not be sent')
+      return null
+    }
+    resendClient = new Resend(apiKey)
+  }
+  return resendClient
+}
 
 interface SendRegistrationEmailProps {
   to: string
@@ -27,6 +40,13 @@ export async function sendRegistrationEmail({
   zellePhone,
   registrationId,
 }: SendRegistrationEmailProps) {
+  const resend = getResendClient()
+  
+  if (!resend) {
+    console.log('Resend not configured, skipping email send')
+    return { error: 'Email service not configured' }
+  }
+  
   const totalPrice = eventPrice * ticketCount
   const ticketWord = ticketCount === 1 ? 'ticket' : 'tickets'
   
@@ -180,6 +200,13 @@ export async function sendPaymentConfirmation({
   eventDate,
   eventTime,
 }: SendPaymentConfirmationProps) {
+  const resend = getResendClient()
+  
+  if (!resend) {
+    console.log('Resend not configured, skipping payment confirmation email')
+    return { error: 'Email service not configured' }
+  }
+  
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'Redhead Whiskey <events@redheadwhiskey.com>',
