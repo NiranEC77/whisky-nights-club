@@ -156,10 +156,6 @@ export default async function AdminMembershipsPage() {
                                             </p>
                                         </div>
                                         <div className="flex gap-2">
-                                            <form action={markAsPending}>
-                                                <input type="hidden" name="membership_id" value={membership.id} />
-                                                <Button type="submit" variant="outline" size="sm">Mark Unpaid</Button>
-                                            </form>
                                             <form action={handleDelete}>
                                                 <input type="hidden" name="membership_id" value={membership.id} />
                                                 <Button type="submit" variant="destructive" size="sm">Delete</Button>
