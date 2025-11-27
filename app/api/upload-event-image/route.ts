@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { createClient } from '@supabase/supabase-js'
 import { randomBytes } from 'crypto'
-import { existsSync } from 'fs'
 
-// Use dynamic runtime for file operations
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+// Initialize Supabase client with service role key
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
+
 export async function POST(request: NextRequest) {
   console.log('=== Upload API route called ===')
-  console.log('Environment:', process.env.NODE_ENV)
   
   try {
     const formData = await request.formData()
@@ -25,16 +32,6 @@ export async function POST(request: NextRequest) {
     if (!file || file.size === 0) {
       console.error('No file provided')
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-    }
-
-    // Validate file type (lenient for cropped images)
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/octet-stream']
-    if (!allowedTypes.includes(file.type)) {
-      console.error('Invalid file type:', file.type)
-      return NextResponse.json(
-        { error: `Invalid file type: ${file.type}. Please upload JPG, PNG, or WebP images.` },
-        { status: 400 }
-      )
     }
 
     // Validate file size (max 5MB)
@@ -54,32 +51,42 @@ export async function POST(request: NextRequest) {
 
     console.log('Generated filename:', filename)
 
-    // Ensure events directory exists
-    const eventsDir = join(process.cwd(), 'public', 'images', 'events')
-    console.log('Events directory path:', eventsDir)
-    
-    if (!existsSync(eventsDir)) {
-      console.log('Creating events directory...')
-      await mkdir(eventsDir, { recursive: true })
-    }
-
     // Convert file to buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     console.log('Buffer created, size:', buffer.length)
 
-    // Write file
-    const publicPath = join(eventsDir, filename)
-    console.log('Writing to:', publicPath)
+    // Upload to Supabase Storage
+    console.log('Uploading to Supabase Storage bucket: event-images')
     
-    await writeFile(publicPath, buffer)
-    console.log('✅ File written successfully!')
+    const { data, error: uploadError } = await supabaseAdmin
+      .storage
+      .from('event-images')
+      .upload(filename, buffer, {
+        contentType: 'image/jpeg',
+        cacheControl: '3600',
+        upsert: false
+      })
 
-    // Return path for database
-    const dbPath = `/images/events/${filename}`
-    console.log('Returning path:', dbPath)
-    
-    return NextResponse.json({ path: dbPath })
+    if (uploadError) {
+      console.error('Supabase upload error:', uploadError)
+      return NextResponse.json(
+        { error: `Upload failed: ${uploadError.message}` },
+        { status: 500 }
+      )
+    }
+
+    console.log('Upload successful, data:', data)
+
+    // Get public URL
+    const { data: { publicUrl } } = supabaseAdmin
+      .storage
+      .from('event-images')
+      .getPublicUrl(data.path)
+
+    console.log('Public URL:', publicUrl)
+
+    return NextResponse.json({ path: publicUrl })
 
   } catch (error) {
     console.error('❌ Error in upload route:', error)
@@ -90,8 +97,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(
       { 
-        error: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        details: error instanceof Error ? error.stack : undefined
+        error: `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`
       },
       { status: 500 }
     )
