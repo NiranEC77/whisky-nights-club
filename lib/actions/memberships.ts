@@ -17,8 +17,8 @@ export async function createMembership(formData: FormData) {
     const paymentMethod = formData.get('payment_method') as string
 
     // Validate payment method
-    if (!['venmo', 'paypal', 'zelle', 'googlepay'].includes(paymentMethod)) {
-        return { error: 'Invalid payment method' }
+    if (!['stripe', 'paypal'].includes(paymentMethod)) {
+        return { error: 'Invalid payment method. Only Stripe and PayPal are supported.' }
     }
 
     // Calculate membership dates (1 year from today)
@@ -36,6 +36,7 @@ export async function createMembership(formData: FormData) {
             start_date: startDate.toISOString().split('T')[0],
             end_date: endDate.toISOString().split('T')[0],
             events_used: 0,
+            friend_used: false,
             payment_status: 'pending',
         })
         .select()
@@ -62,7 +63,7 @@ export async function getActiveMembershipByEmail(email: string): Promise<Members
         .eq('email', email)
         .eq('payment_status', 'paid')
         .gte('end_date', new Date().toISOString().split('T')[0])
-        .lt('events_used', 2)
+        .lt('events_used', 1)
         .order('end_date', { ascending: false })
         .limit(1)
         .single()
@@ -239,5 +240,24 @@ export async function deleteMembership(membershipId: string) {
     }
 
     revalidatePath('/admin/memberships')
+    return { success: true }
+}
+
+/**
+ * Mark friend as used for a membership
+ */
+export async function markFriendUsed(membershipId: string) {
+    const supabase = createServiceClient()
+
+    const { error } = await supabase
+        .from('memberships')
+        .update({ friend_used: true })
+        .eq('id', membershipId)
+
+    if (error) {
+        console.error('Error marking friend as used:', error)
+        return { error: error.message }
+    }
+
     return { success: true }
 }

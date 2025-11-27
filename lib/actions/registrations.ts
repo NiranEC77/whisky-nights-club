@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { revalidatePath } from 'next/cache'
 import { sendRegistrationEmail, sendPaymentConfirmation } from '@/lib/email'
-import { getActiveMembershipByEmail, incrementMembershipEvent } from './memberships'
+import { getActiveMembershipByEmail, incrementMembershipEvent, markFriendUsed } from './memberships'
 import { PaymentMethod } from '@/lib/types'
 
 export async function createRegistration(formData: FormData) {
@@ -16,7 +16,9 @@ export async function createRegistration(formData: FormData) {
   const email = formData.get('email') as string
   const phone = formData.get('phone') as string
   const ticketCount = parseInt(formData.get('ticket_count') as string) || 1
-  const paymentMethod = (formData.get('payment_method') as PaymentMethod) || 'zelle'
+  const paymentMethod = (formData.get('payment_method') as PaymentMethod) || 'stripe'
+  const paymentCode = formData.get('payment_code') as string | null
+  const broughtFriend = formData.get('brought_friend') === 'true'
 
   // Validate ticket count
   if (ticketCount < 1 || ticketCount > 2) {
@@ -24,14 +26,23 @@ export async function createRegistration(formData: FormData) {
   }
 
   // Validate payment method
-  if (!['venmo', 'paypal', 'zelle', 'googlepay'].includes(paymentMethod)) {
-    return { error: 'Invalid payment method' }
+  if (!['stripe', 'paypal'].includes(paymentMethod)) {
+    return { error: 'Invalid payment method. Only Stripe and PayPal are supported.' }
   }
+
+  // Check if payment code is valid (for testing)
+  const isTestPayment = paymentCode === 'CHEAT'
 
   // Check for active membership
   const activeMembership = await getActiveMembershipByEmail(email)
   const isFreeWithMembership = activeMembership !== null
   const membershipId = activeMembership?.id || null
+
+  // Check if user can bring a friend
+  const canBringFriend = activeMembership && !activeMembership.friend_used
+  if (broughtFriend && !canBringFriend) {
+    return { error: 'You have already used your friend benefit or do not have an active membership' }
+  }
 
   // Get event details (need full info for email)
   const { data: event } = await supabase
@@ -72,10 +83,12 @@ export async function createRegistration(formData: FormData) {
       email,
       phone,
       ticket_count: ticketCount,
-      payment_status: isFreeWithMembership ? 'paid' : 'pending',
+      payment_status: isFreeWithMembership || isTestPayment ? 'paid' : 'pending',
       payment_method: paymentMethod,
       membership_id: membershipId,
       is_free_with_membership: isFreeWithMembership,
+      brought_friend: broughtFriend,
+      payment_code: paymentCode,
     })
     .select()
     .single()
@@ -90,6 +103,15 @@ export async function createRegistration(formData: FormData) {
     const result = await incrementMembershipEvent(membershipId)
     if (result.error) {
       console.error('Error updating membership:', result.error)
+      // Don't fail the registration, but log the error
+    }
+  }
+
+  // If bringing a friend, mark friend as used
+  if (broughtFriend && membershipId) {
+    const result = await markFriendUsed(membershipId)
+    if (result.error) {
+      console.error('Error marking friend as used:', result.error)
       // Don't fail the registration, but log the error
     }
   }

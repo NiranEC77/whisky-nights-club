@@ -62,9 +62,18 @@ export default async function MembershipPage({
                             <div className="flex items-start gap-3">
                                 <CheckCircle2 className="h-5 w-5 text-whisky-gold mt-0.5" />
                                 <div>
-                                    <p className="font-semibold">{freeEvents} Free Events</p>
+                                    <p className="font-semibold">1 Free Event Entry</p>
                                     <p className="text-sm text-whisky-cream/60">
-                                        Attend {freeEvents} whisky tasting events absolutely free
+                                        Attend one whisky tasting event absolutely free during your membership year
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <CheckCircle2 className="h-5 w-5 text-whisky-gold mt-0.5" />
+                                <div>
+                                    <p className="font-semibold">Bring 1 Friend Free (One-Time)</p>
+                                    <p className="text-sm text-whisky-cream/60">
+                                        Bring a friend to any event for free - one-time benefit during your membership year
                                     </p>
                                 </div>
                             </div>

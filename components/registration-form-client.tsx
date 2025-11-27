@@ -19,7 +19,9 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
     const [ticketCount, setTicketCount] = useState(1)
     const [checkingMembership, setCheckingMembership] = useState(false)
     const [hasMembership, setHasMembership] = useState(false)
+    const [membershipData, setMembershipData] = useState<{ hasMembership: boolean, friendUsed: boolean } | null>(null)
     const [showPaymentMethod, setShowPaymentMethod] = useState(true)
+    const [broughtFriend, setBroughtFriend] = useState(false)
 
     // Check for active membership when email changes
     useEffect(() => {
@@ -35,6 +37,7 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
                 const response = await fetch(`/api/check-membership?email=${encodeURIComponent(email)}`)
                 const data = await response.json()
                 setHasMembership(data.hasMembership)
+                setMembershipData(data)
                 setShowPaymentMethod(!data.hasMembership)
             } catch (error) {
                 console.error('Error checking membership:', error)
@@ -77,9 +80,36 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
                         <p className="text-green-300/80 text-xs mt-1">
                             This event will be FREE with your membership. No payment required!
                         </p>
+                        {!membershipData?.friendUsed && (
+                            <p className="text-green-300/80 text-xs mt-1">
+                                💚 You can also bring 1 friend for free (one-time benefit)
+                            </p>
+                        )}
                     </div>
                 )}
             </div>
+
+            {hasMembership && !membershipData?.friendUsed && (
+                <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            id="brought_friend"
+                            name="brought_friend"
+                            value="true"
+                            checked={broughtFriend}
+                            onChange={(e) => setBroughtFriend(e.target.checked)}
+                            className="h-4 w-4 rounded border-whisky-gold/30 bg-whisky-darker text-whisky-gold focus:ring-whisky-gold"
+                        />
+                        <Label htmlFor="brought_friend" className="cursor-pointer">
+                            I&apos;m bringing a friend (FREE - one-time benefit)
+                        </Label>
+                    </div>
+                    <p className="text-xs text-whisky-cream/60 ml-6">
+                        Check this box to use your one-time friend benefit. Your friend gets free entry to this event!
+                    </p>
+                </div>
+            )}
 
             <div className="space-y-2">
                 <Label htmlFor="ticket_count">How many people registering? *</Label>
@@ -131,6 +161,18 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
             {showPaymentMethod && !hasMembership && (
                 <>
                     <PaymentMethodSelector />
+
+                    <div className="space-y-2">
+                        <Label htmlFor="payment_code">Payment Code (Optional)</Label>
+                        <Input
+                            id="payment_code"
+                            name="payment_code"
+                            placeholder="Enter code if you have one"
+                        />
+                        <p className="text-xs text-whisky-cream/60">
+                            For testing purposes only
+                        </p>
+                    </div>
 
                     <div className="bg-yellow-900/20 border-2 border-yellow-500/50 rounded-lg p-4">
                         <p className="text-yellow-300 font-semibold text-sm flex items-center gap-2">

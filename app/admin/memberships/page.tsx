@@ -150,7 +150,8 @@ export default async function AdminMembershipsPage() {
                                             <p className="font-semibold">{membership.full_name}</p>
                                             <p className="text-sm text-whisky-cream/60">{membership.email}</p>
                                             <p className="text-xs text-whisky-cream/40">
-                                                Events used: {membership.events_used}/2 •
+                                                Free entry: {membership.events_used}/1 used •
+                                                Friend benefit: {membership.friend_used ? 'Used ✓' : 'Available'} •
                                                 Expires: {new Date(membership.end_date).toLocaleDateString()}
                                             </p>
                                         </div>

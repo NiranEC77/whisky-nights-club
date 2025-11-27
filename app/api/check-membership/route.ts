@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
         hasMembership: membership !== null,
-        eventsRemaining: membership ? 2 - membership.events_used : 0
+        friendUsed: membership?.friend_used || false,
+        eventsRemaining: membership ? 1 - membership.events_used : 0
     })
 }

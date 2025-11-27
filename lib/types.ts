@@ -22,7 +22,7 @@ export interface Event {
   available_seats?: number
 }
 
-export type PaymentMethod = 'venmo' | 'paypal' | 'zelle' | 'googlepay'
+export type PaymentMethod = 'stripe' | 'paypal'
 
 export interface Registration {
   id: string
@@ -36,6 +36,8 @@ export interface Registration {
   payment_method: PaymentMethod
   membership_id: string | null
   is_free_with_membership: boolean
+  brought_friend: boolean
+  payment_code: string | null
   created_at: string
   event?: Event
 }
@@ -49,6 +51,7 @@ export interface Membership {
   start_date: string
   end_date: string
   events_used: number
+  friend_used: boolean
   payment_status: 'pending' | 'paid'
   payment_method: PaymentMethod | null
   created_at: string
