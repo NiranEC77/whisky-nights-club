@@ -10,22 +10,27 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-whisky-bourbon/20 via-whisky-dark to-whisky-dark" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=1920')] bg-cover bg-center opacity-10" />
+      <section className="relative py-32 px-4 overflow-hidden min-h-[600px] flex items-center">
+        {/* Featured Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: "url('/images/featured_image.jpg')" }}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-whisky-dark/80 via-whisky-dark/70 to-whisky-dark/90" />
         
         <div className="container mx-auto relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <div className="flex justify-center mb-6">
               <Wine className="h-20 w-20 text-whisky-gold animate-fade-in" />
             </div>
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in">
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg">
               Join the Club
             </h1>
-            <p className="text-xl md:text-2xl text-whisky-cream/80 animate-fade-in">
+            <p className="text-xl md:text-2xl text-whisky-cream animate-fade-in drop-shadow-md">
               Bringing people together through good drinks, delicious food, engaging company and great conversation
             </p>
-            <p className="text-lg text-whisky-cream/70 italic animate-fade-in">
+            <p className="text-lg text-whisky-cream/90 italic animate-fade-in drop-shadow-md">
               It&apos;s about the togetherness.
             </p>
           </div>

@@ -20,6 +20,17 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Redhead Whiskey - Bringing People Together',
   description: 'Bringing people together through good drinks, delicious food, engaging company and great conversation. It\'s about the togetherness.',
+  openGraph: {
+    title: 'Redhead Whiskey - Bringing People Together',
+    description: 'Join our whiskey club for curated tasting experiences. It\'s about the togetherness.',
+    images: ['/images/featured_image.jpg'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Redhead Whiskey - Bringing People Together',
+    description: 'Join our whiskey club for curated tasting experiences. It\'s about the togetherness.',
+    images: ['/images/featured_image.jpg'],
+  },
 }
 
 export default async function RootLayout({
