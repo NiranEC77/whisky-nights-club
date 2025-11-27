@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { ImageUpload } from '@/components/image-upload'
+import { ImageUploadClient } from '@/components/image-upload-client'
 import Link from 'next/link'
 
 export default async function NewEventPage() {
@@ -19,13 +19,20 @@ export default async function NewEventPage() {
   async function handleCreateEvent(formData: FormData) {
     'use server'
     
+    console.log('Creating event with formData:', {
+      title: formData.get('title'),
+      date: formData.get('date'),
+      featured_image: formData.get('featured_image'),
+    })
+    
     const result = await createEvent(formData)
     
     if (result.error) {
-      console.error(result.error)
+      console.error('Error creating event:', result.error)
       return
     }
     
+    console.log('Event created successfully:', result.data)
     redirect('/admin')
   }
 
@@ -70,7 +77,7 @@ export default async function NewEventPage() {
                 />
               </div>
 
-              <ImageUpload
+              <ImageUploadClient
                 name="featured_image"
                 label="Featured Image"
               />

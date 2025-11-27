@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { ImageUpload } from '@/components/image-upload'
+import { ImageUploadClient } from '@/components/image-upload-client'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -78,7 +78,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
                 />
               </div>
 
-              <ImageUpload
+              <ImageUploadClient
                 name="featured_image"
                 label="Featured Image"
                 defaultValue={event.featured_image || undefined}

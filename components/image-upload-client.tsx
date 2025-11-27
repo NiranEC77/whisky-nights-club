@@ -1,26 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ImageCropper } from '@/components/image-cropper'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { X, Image as ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 
-interface ImageUploadProps {
+interface ImageUploadClientProps {
   name: string
   label: string
   defaultValue?: string
-  onChange?: (path: string) => void
 }
 
-export function ImageUpload({ name, label, defaultValue, onChange }: ImageUploadProps) {
-  const [preview, setPreview] = useState<string | null>(defaultValue || null)
+export function ImageUploadClient({ name, label, defaultValue }: ImageUploadClientProps) {
+  const [preview, setPreview] = useState<string>(defaultValue || '')
   const [tempImage, setTempImage] = useState<string | null>(null)
   const [showCropper, setShowCropper] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Sync preview with parent form
+  useEffect(() => {
+    const hiddenInput = document.getElementById(`${name}`) as HTMLInputElement
+    if (hiddenInput && preview) {
+      hiddenInput.value = preview
+    }
+  }, [preview, name])
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -34,7 +41,7 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
     }
 
     // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024 // 5MB
+    const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
       setError('File too large. Maximum size is 5MB.')
       return
@@ -56,23 +63,14 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
     setError(null)
 
     try {
-      // Create a File object with explicit JPEG type
       const file = new File([croppedBlob], 'cropped-image.jpg', { type: 'image/jpeg' })
-      
-      console.log('Uploading cropped image:', file.size, 'bytes, type:', file.type)
-      
-      // Create FormData with cropped image
       const formData = new FormData()
       formData.append('image', file)
 
-      console.log('Sending request to /api/upload-event-image')
-      
       const response = await fetch('/api/upload-event-image', {
         method: 'POST',
         body: formData,
       })
-
-      console.log('Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         let errorMessage = `Upload failed: ${response.status}`
@@ -83,36 +81,19 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
           const errorText = await response.text()
           errorMessage = errorText || errorMessage
         }
-        console.error('Upload failed:', errorMessage)
         setError(errorMessage)
         setTempImage(null)
         return
       }
 
       const result = await response.json()
-      console.log('Upload result:', result)
 
       if (result.error) {
-        console.error('Server returned error:', result.error)
         setError(result.error)
         setTempImage(null)
       } else if (result.path) {
-        // Set preview to uploaded image
-        console.log('Setting preview to:', result.path)
         setPreview(result.path)
         setTempImage(null)
-        onChange?.(result.path)
-        
-        // Force form to recognize the change
-        setTimeout(() => {
-          const hiddenInput = document.getElementById(`${name}-path`) as HTMLInputElement
-          if (hiddenInput) {
-            console.log('Hidden input value set to:', result.path)
-            hiddenInput.value = result.path
-            // Trigger change event
-            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }))
-          }
-        }, 100)
       }
     } catch (err) {
       console.error('Upload error:', err)
@@ -126,38 +107,32 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
   const handleCropCancel = () => {
     setShowCropper(false)
     setTempImage(null)
-    // Clear the file input
-    const fileInput = document.getElementById(name) as HTMLInputElement
+    const fileInput = document.getElementById(`${name}-file`) as HTMLInputElement
     if (fileInput) {
       fileInput.value = ''
     }
   }
 
   const clearImage = () => {
-    setPreview(null)
+    setPreview('')
     setError(null)
-    const hiddenInput = document.getElementById(`${name}-path`) as HTMLInputElement
-    if (hiddenInput) {
-      hiddenInput.value = ''
-    }
-    const fileInput = document.getElementById(name) as HTMLInputElement
+    const fileInput = document.getElementById(`${name}-file`) as HTMLInputElement
     if (fileInput) {
       fileInput.value = ''
     }
-    onChange?.('')
   }
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={`${name}-file`}>{label}</Label>
       
-      {/* Hidden input to store the uploaded path */}
+      {/* Hidden input to store the uploaded path - simple and clean */}
       <input 
         type="hidden" 
-        id={`${name}-path`} 
+        id={name} 
         name={name} 
-        value={preview || defaultValue || ''} 
-        onChange={() => {}} // Prevent React warning about controlled input
+        defaultValue={preview || defaultValue || ''} 
+        key={preview} // Force re-render when preview changes
       />
       
       {preview ? (
@@ -183,7 +158,7 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
       ) : (
         <div className="flex items-center justify-center w-full">
           <label
-            htmlFor={name}
+            htmlFor={`${name}-file`}
             className="flex flex-col items-center justify-center w-full h-48 border-2 border-whisky-gold/30 border-dashed rounded-lg cursor-pointer bg-whisky-darker/50 hover:bg-whisky-darker/70 transition-colors"
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -196,7 +171,7 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
               </p>
             </div>
             <Input
-              id={name}
+              id={`${name}-file`}
               type="file"
               className="hidden"
               accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -219,7 +194,6 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
         Optional: Upload a featured image for this event. You&apos;ll be able to crop it before uploading.
       </p>
 
-      {/* Image Cropper Modal */}
       {tempImage && (
         <ImageCropper
           imageSrc={tempImage}
@@ -231,3 +205,4 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
     </div>
   )
 }
+
