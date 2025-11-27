@@ -2,6 +2,7 @@ import { getEvents } from '@/lib/actions/events'
 import { EventCard } from '@/components/event-card'
 import { Calendar, Users } from 'lucide-react'
 import { DramGlass } from '@/components/icons/dram-glass'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,18 +14,20 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative py-24 px-4 overflow-hidden min-h-[600px] flex items-start pt-32">
         {/* Featured Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center" 
+        <div
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/images/featured_image.jpg')" }}
         />
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-whisky-dark/80 via-whisky-dark/70 to-whisky-dark/90" />
-        
+
         <div className="container mx-auto relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-4">
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg">
-              Join the Club
-            </h1>
+            <Link href="/membership">
+              <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg hover:scale-105 transition-transform cursor-pointer">
+                Join the Club
+              </h1>
+            </Link>
             <p className="text-xl md:text-2xl text-whisky-cream animate-fade-in drop-shadow-md">
               Bringing people together through good drinks, delicious food, engaging company and great conversation
             </p>
