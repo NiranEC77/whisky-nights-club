@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { revalidatePath } from 'next/cache'
+import { sendRegistrationEmail, sendPaymentConfirmation } from '@/lib/email'
 
 export async function createRegistration(formData: FormData) {
   // Use service client for public registration (no auth needed)
@@ -19,10 +20,10 @@ export async function createRegistration(formData: FormData) {
     return { error: 'Ticket count must be 1 or 2' }
   }
 
-  // Check if event is full
+  // Get event details (need full info for email)
   const { data: event } = await supabase
     .from('events')
-    .select('id, max_seats, registrations(id, ticket_count)')
+    .select('id, title, date, start_time, price, max_seats, registrations(id, ticket_count)')
     .eq('id', eventId)
     .single()
 
@@ -68,6 +69,28 @@ export async function createRegistration(formData: FormData) {
     return { error: error.message }
   }
 
+  // Send confirmation email
+  console.log('Sending registration confirmation email to:', email)
+  const emailResult = await sendRegistrationEmail({
+    to: email,
+    eventTitle: event.title,
+    eventDate: event.date,
+    eventTime: event.start_time,
+    eventPrice: event.price,
+    ticketCount,
+    attendeeName: fullName,
+    zelleEmail: process.env.NEXT_PUBLIC_ZELLE_EMAIL || '',
+    zellePhone: process.env.NEXT_PUBLIC_ZELLE_PHONE,
+    registrationId: data.id,
+  })
+
+  if (emailResult.error) {
+    console.error('Failed to send confirmation email:', emailResult.error)
+    // Don't fail the registration if email fails
+  } else {
+    console.log('Confirmation email sent successfully')
+  }
+
   revalidatePath(`/event/${eventId}`)
   revalidatePath('/')
   return { data }
@@ -110,6 +133,18 @@ export async function updatePaymentStatus(registrationId: string, status: 'pendi
     return { error: 'Unauthorized: Admin access required' }
   }
 
+  // Get registration with event details for email
+  const { data: registration, error: fetchError } = await supabase
+    .from('registrations')
+    .select('*, events(title, date, start_time)')
+    .eq('id', registrationId)
+    .single()
+
+  if (fetchError || !registration) {
+    console.error('Error fetching registration:', fetchError)
+    return { error: 'Registration not found' }
+  }
+
   const { data, error } = await supabase
     .from('registrations')
     .update({ payment_status: status })
@@ -120,6 +155,25 @@ export async function updatePaymentStatus(registrationId: string, status: 'pendi
   if (error) {
     console.error('Error updating payment status:', error)
     return { error: error.message }
+  }
+
+  // Send payment confirmation email when marked as paid
+  if (status === 'paid' && registration.events) {
+    console.log('Sending payment confirmation email to:', registration.email)
+    const emailResult = await sendPaymentConfirmation({
+      to: registration.email,
+      attendeeName: registration.full_name,
+      eventTitle: registration.events.title,
+      eventDate: registration.events.date,
+      eventTime: registration.events.start_time,
+    })
+
+    if (emailResult.error) {
+      console.error('Failed to send payment confirmation:', emailResult.error)
+      // Don't fail the update if email fails
+    } else {
+      console.log('Payment confirmation email sent successfully')
+    }
   }
 
   revalidatePath('/admin')
