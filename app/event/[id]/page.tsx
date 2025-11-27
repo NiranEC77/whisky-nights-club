@@ -5,6 +5,7 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,11 +23,27 @@ export default async function EventPage({ params }: { params: { id: string } }) 
       <div className="container mx-auto max-w-5xl">
         {/* Hero Image */}
         <div className="relative h-96 rounded-lg overflow-hidden mb-8 shadow-gold">
-          <div className="absolute inset-0 bg-gradient-to-br from-whisky-bourbon/40 via-whisky-gold/30 to-whisky-amber/40" />
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=1920')] bg-cover bg-center opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-whisky-darker via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <h1 className="text-4xl md:text-6xl font-serif font-bold text-gradient-gold mb-4">
+          {event.featured_image ? (
+            <>
+              <Image
+                src={event.featured_image}
+                alt={event.title}
+                fill
+                className="object-cover"
+                unoptimized
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-whisky-darker via-whisky-dark/50 to-transparent" />
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-br from-whisky-bourbon/40 via-whisky-gold/30 to-whisky-amber/40" />
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=1920')] bg-cover bg-center opacity-40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-whisky-darker via-transparent to-transparent" />
+            </>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
+            <h1 className="text-4xl md:text-6xl font-serif font-bold text-gradient-gold mb-4 drop-shadow-lg">
               {event.title}
             </h1>
           </div>
