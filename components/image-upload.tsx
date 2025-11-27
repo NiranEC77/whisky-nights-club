@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ImageCropper } from '@/components/image-cropper'
 import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 
@@ -16,27 +17,48 @@ interface ImageUploadProps {
 
 export function ImageUpload({ name, label, defaultValue, onChange }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(defaultValue || null)
+  const [tempImage, setTempImage] = useState<string | null>(null)
+  const [showCropper, setShowCropper] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview immediately
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setError('Invalid file type. Please upload JPG, PNG, or WebP images.')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      setError('File too large. Maximum size is 5MB.')
+      return
+    }
+
+    // Show preview and open cropper
     const reader = new FileReader()
     reader.onloadend = () => {
-      setPreview(reader.result as string)
+      setTempImage(reader.result as string)
+      setShowCropper(true)
+      setError(null)
     }
     reader.readAsDataURL(file)
+  }
 
-    // Upload file
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setShowCropper(false)
     setIsUploading(true)
     setError(null)
 
     try {
+      // Create FormData with cropped image
       const formData = new FormData()
-      formData.append('image', file)
+      formData.append('image', croppedBlob, 'cropped-image.jpg')
 
       const response = await fetch('/api/upload-event-image', {
         method: 'POST',
@@ -47,9 +69,13 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
 
       if (result.error) {
         setError(result.error)
-        setPreview(defaultValue || null)
+        setTempImage(null)
       } else if (result.path) {
-        // Store the path in a hidden input
+        // Set preview to uploaded image
+        setPreview(result.path)
+        setTempImage(null)
+        
+        // Store the path in hidden input
         const hiddenInput = document.getElementById(`${name}-path`) as HTMLInputElement
         if (hiddenInput) {
           hiddenInput.value = result.path
@@ -59,9 +85,19 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
     } catch (err) {
       console.error('Upload error:', err)
       setError('Failed to upload image. Please try again.')
-      setPreview(defaultValue || null)
+      setTempImage(null)
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  const handleCropCancel = () => {
+    setShowCropper(false)
+    setTempImage(null)
+    // Clear the file input
+    const fileInput = document.getElementById(name) as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
     }
   }
 
@@ -125,7 +161,7 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
               type="file"
               className="hidden"
               accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={handleFileChange}
+              onChange={handleFileSelect}
               disabled={isUploading}
             />
           </label>
@@ -141,9 +177,18 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
       )}
 
       <p className="text-xs text-whisky-cream/60">
-        Optional: Upload a featured image for this event (bottle photo, tasting room, etc.)
+        Optional: Upload a featured image for this event. You&apos;ll be able to crop it before uploading.
       </p>
+
+      {/* Image Cropper Modal */}
+      {tempImage && (
+        <ImageCropper
+          imageSrc={tempImage}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          open={showCropper}
+        />
+      )}
     </div>
   )
 }
-
