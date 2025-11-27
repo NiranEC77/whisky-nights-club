@@ -35,9 +35,9 @@ export function Header({ user }: HeaderProps) {
         <div className="flex flex-col items-center mb-4">
           <Link href="/" className="flex flex-col items-center gap-3 group">
             <div className="relative h-20 w-20 group-hover:scale-105 transition-transform">
-              <Image 
-                src="/images/logo.png" 
-                alt="Redhead Whiskey Logo" 
+              <Image
+                src="/images/logo.png"
+                alt="Redhead Whiskey Logo"
                 fill
                 className="object-contain"
                 priority
@@ -60,6 +60,15 @@ export function Header({ user }: HeaderProps) {
             </Button>
           </Link>
 
+          <Link href="/membership">
+            <Button
+              variant={pathname === '/membership' ? 'default' : 'ghost'}
+              className="text-sm"
+            >
+              Membership
+            </Button>
+          </Link>
+
           {isAdmin && (
             <>
               <Link href="/admin">
@@ -76,6 +85,14 @@ export function Header({ user }: HeaderProps) {
                   className="text-sm"
                 >
                   Users
+                </Button>
+              </Link>
+              <Link href="/admin/memberships">
+                <Button
+                  variant={pathname === '/admin/memberships' ? 'default' : 'ghost'}
+                  className="text-sm"
+                >
+                  Memberships
                 </Button>
               </Link>
             </>

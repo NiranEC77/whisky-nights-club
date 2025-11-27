@@ -129,7 +129,20 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
             </div>
 
             {showPaymentMethod && !hasMembership && (
-                <PaymentMethodSelector />
+                <>
+                    <PaymentMethodSelector />
+
+                    <div className="bg-yellow-900/20 border-2 border-yellow-500/50 rounded-lg p-4">
+                        <p className="text-yellow-300 font-semibold text-sm flex items-center gap-2">
+                            <span className="text-2xl">⚠️</span>
+                            <span>Payment Required to Attend</span>
+                        </p>
+                        <p className="text-yellow-200/80 text-xs mt-2">
+                            After clicking &quot;Register &amp; Get Payment Instructions&quot;, you MUST complete payment to confirm your spot.
+                            Your registration will be <strong>pending</strong> until payment is received and confirmed by our team.
+                        </p>
+                    </div>
+                </>
             )}
 
             <div className="border-t border-whisky-gold/20 pt-6 space-y-3">
@@ -152,7 +165,7 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
                         <span>{formatCurrency(event.price)}</span>
                     </div>
                     <div className="flex justify-between font-semibold text-base pt-2 border-t border-whisky-gold/20">
-                        <span>Total</span>
+                        <span>Total {!hasMembership && 'Due'}</span>
                         {hasMembership ? (
                             <span className="text-green-400">FREE with Membership! 🎉</span>
                         ) : (
@@ -163,12 +176,18 @@ export function RegistrationFormClient({ event, onSubmit }: RegistrationFormClie
             </div>
 
             <Button type="submit" className="w-full" size="lg">
-                Complete Registration
+                {hasMembership ? 'Confirm Registration (FREE)' : 'Register & Get Payment Instructions'}
             </Button>
 
             <p className="text-xs text-center text-whisky-cream/60">
-                By registering, you agree to receive {hasMembership ? 'confirmation' : 'payment instructions'}.
-                Your spot will be reserved {hasMembership ? 'immediately' : 'upon payment confirmation'}.
+                {hasMembership ? (
+                    <>Your membership benefit will be applied automatically. You&apos;re all set!</>
+                ) : (
+                    <>
+                        <strong>Important:</strong> You will receive payment instructions after registration.
+                        Payment must be completed within 24 hours to secure your spot.
+                    </>
+                )}
             </p>
         </form>
     )
