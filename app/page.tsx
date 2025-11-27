@@ -24,7 +24,7 @@ export default async function HomePage() {
         <div className="container mx-auto relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-4">
             <Link href="/membership">
-              <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg hover:scale-105 transition-transform cursor-pointer">
+              <h1 className="text-5xl md:text-7xl font-serif font-bold text-gradient-gold animate-fade-in drop-shadow-lg hover:scale-105 transition-all cursor-pointer underline decoration-whisky-gold decoration-4 underline-offset-8 hover:decoration-8">
                 Join the Club
               </h1>
             </Link>
