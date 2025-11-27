@@ -12,11 +12,17 @@ export async function createRegistration(formData: FormData) {
   const fullName = formData.get('full_name') as string
   const email = formData.get('email') as string
   const phone = formData.get('phone') as string
+  const ticketCount = parseInt(formData.get('ticket_count') as string) || 1
+
+  // Validate ticket count
+  if (ticketCount < 1 || ticketCount > 2) {
+    return { error: 'Ticket count must be 1 or 2' }
+  }
 
   // Check if event is full
   const { data: event } = await supabase
     .from('events')
-    .select('id, max_seats, registrations(id)')
+    .select('id, max_seats, registrations(id, ticket_count)')
     .eq('id', eventId)
     .single()
 
@@ -24,9 +30,12 @@ export async function createRegistration(formData: FormData) {
     return { error: 'Event not found' }
   }
 
-  const registeredCount = event.registrations?.length || 0
-  if (registeredCount >= event.max_seats) {
-    return { error: 'Event is full' }
+  // Calculate total tickets registered
+  const totalTicketsRegistered = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
+  const availableSeats = event.max_seats - totalTicketsRegistered
+  
+  if (availableSeats < ticketCount) {
+    return { error: `Not enough seats available. Only ${availableSeats} seat(s) remaining.` }
   }
 
   // Check if email already registered for this event
@@ -48,6 +57,7 @@ export async function createRegistration(formData: FormData) {
       full_name: fullName,
       email,
       phone,
+      ticket_count: ticketCount,
       payment_status: 'pending',
     })
     .select()
@@ -61,6 +71,23 @@ export async function createRegistration(formData: FormData) {
   revalidatePath(`/event/${eventId}`)
   revalidatePath('/')
   return { data }
+}
+
+export async function getRegistrationById(id: string) {
+  const supabase = createServiceClient()
+
+  const { data, error } = await supabase
+    .from('registrations')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching registration:', error)
+    return null
+  }
+
+  return data
 }
 
 export async function updatePaymentStatus(registrationId: string, status: 'pending' | 'paid') {
@@ -166,4 +193,3 @@ export async function getRegistrationsByEvent(eventId: string) {
 
   return { data }
 }
-

@@ -13,6 +13,7 @@ export async function getEvents(): Promise<EventWithRegistrations[]> {
       *,
       registrations (
         id,
+        ticket_count,
         payment_status
       )
     `)
@@ -24,11 +25,14 @@ export async function getEvents(): Promise<EventWithRegistrations[]> {
     return []
   }
 
-  return events.map((event) => ({
-    ...event,
-    registered_count: event.registrations?.length || 0,
-    available_seats: event.max_seats - (event.registrations?.length || 0),
-  }))
+  return events.map((event) => {
+    const totalTickets = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
+    return {
+      ...event,
+      registered_count: event.registrations?.length || 0,
+      available_seats: event.max_seats - totalTickets,
+    }
+  })
 }
 
 export async function getEventById(id: string): Promise<EventWithRegistrations | null> {
@@ -43,6 +47,7 @@ export async function getEventById(id: string): Promise<EventWithRegistrations |
         full_name,
         email,
         phone,
+        ticket_count,
         payment_status,
         created_at
       ),
@@ -60,10 +65,12 @@ export async function getEventById(id: string): Promise<EventWithRegistrations |
     return null
   }
 
+  const totalTickets = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
+
   return {
     ...event,
     registered_count: event.registrations?.length || 0,
-    available_seats: event.max_seats - (event.registrations?.length || 0),
+    available_seats: event.max_seats - totalTickets,
   }
 }
 

@@ -27,6 +27,7 @@ export interface Registration {
   full_name: string
   email: string
   phone: string
+  ticket_count: number
   payment_status: 'pending' | 'paid'
   created_at: string
   event?: Event

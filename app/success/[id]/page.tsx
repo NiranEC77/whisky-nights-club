@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getEventById } from '@/lib/actions/events'
+import { getRegistrationById } from '@/lib/actions/registrations'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CopyButton } from '@/components/copy-button'
@@ -22,6 +23,11 @@ export default async function SuccessPage({
     notFound()
   }
 
+  // Get registration details to show correct ticket count and total
+  const registration = searchParams.registration ? await getRegistrationById(searchParams.registration) : null
+  const ticketCount = registration?.ticket_count || 1
+  const totalAmount = event.price * ticketCount
+
   const zelleEmail = process.env.NEXT_PUBLIC_ZELLE_EMAIL || 'payments@whiskyclub.com'
   const zellePhone = process.env.NEXT_PUBLIC_ZELLE_PHONE || ''
   const memo = `EVENT-${params.id.slice(0, 8).toUpperCase()}-${searchParams.registration?.slice(0, 8).toUpperCase()}`
@@ -35,7 +41,7 @@ export default async function SuccessPage({
             Registration Successful!
           </h1>
           <p className="text-whisky-cream/70">
-            Your spot has been reserved for {event.title}
+            {ticketCount === 1 ? 'Your spot has' : `${ticketCount} spots have`} been reserved for {event.title}
           </p>
         </div>
 
@@ -51,8 +57,13 @@ export default async function SuccessPage({
               <div className="space-y-2">
                 <p className="text-sm text-whisky-cream/60">Amount to Pay</p>
                 <p className="text-3xl font-bold text-whisky-gold">
-                  {formatCurrency(event.price)}
+                  {formatCurrency(totalAmount)}
                 </p>
+                {ticketCount > 1 && (
+                  <p className="text-xs text-whisky-cream/60">
+                    {ticketCount} tickets × {formatCurrency(event.price)} each
+                  </p>
+                )}
               </div>
 
               <div className="border-t border-whisky-gold/20 pt-4 space-y-3">
@@ -102,7 +113,7 @@ export default async function SuccessPage({
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-whisky-gold mt-1">2.</span>
-                <span>Send {formatCurrency(event.price)} to the email/phone above</span>
+                <span>Send {formatCurrency(totalAmount)} to the email/phone above</span>
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-whisky-gold mt-1">3.</span>

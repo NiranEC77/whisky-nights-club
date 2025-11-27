@@ -137,6 +137,9 @@ export default async function ManageEventPage({ params }: { params: { id: string
                     <div className="flex-1">
                       <h3 className="font-semibold text-whisky-gold mb-1">
                         {registration.full_name}
+                        <span className="ml-2 text-xs font-normal text-whisky-cream/60">
+                          ({registration.ticket_count} {registration.ticket_count === 1 ? 'ticket' : 'tickets'})
+                        </span>
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-whisky-cream/70">
                         <span className="flex items-center gap-1">
@@ -148,7 +151,7 @@ export default async function ManageEventPage({ params }: { params: { id: string
                           {registration.phone}
                         </span>
                       </div>
-                      <div className="mt-2">
+                      <div className="mt-2 flex items-center gap-2">
                         {registration.payment_status === 'paid' ? (
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                             <CheckCircle2 className="h-3 w-3" />
