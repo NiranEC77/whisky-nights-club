@@ -44,14 +44,6 @@ function getPaymentInstructions(method: PaymentMethod, amount: number, memo: str
   const details = getPaymentDetails()
 
   switch (method) {
-    case 'venmo':
-      return `
-        <h2>💳 Payment Instructions</h2>
-        <p>To complete your registration, please send payment via <strong>Venmo</strong>:</p>
-        <p><strong>Send to:</strong> ${details.venmo || 'Not configured'}</p>
-        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
-        <p><strong>Memo/Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
-      `
     case 'paypal':
       return `
         <h2>💳 Payment Instructions</h2>
@@ -60,24 +52,14 @@ function getPaymentInstructions(method: PaymentMethod, amount: number, memo: str
         <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
         <p><strong>Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
       `
-    case 'googlepay':
-      return `
-        <h2>💳 Payment Instructions</h2>
-        <p>To complete your registration, please send payment via <strong>Google Pay</strong>:</p>
-        ${details.googlepay?.email ? `<p><strong>Email:</strong> ${details.googlepay.email}</p>` : ''}
-        ${details.googlepay?.phone ? `<p><strong>Phone:</strong> ${details.googlepay.phone}</p>` : ''}
-        <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
-        <p><strong>Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
-      `
-    case 'zelle':
+    case 'stripe':
     default:
       return `
         <h2>💳 Payment Instructions</h2>
-        <p>To complete your registration, please send payment via <strong>Zelle</strong>:</p>
-        <p><strong>Send to:</strong> ${details.zelle?.email}</p>
-        ${details.zelle?.phone ? `<p><strong>Phone:</strong> ${details.zelle.phone}</p>` : ''}
+        <p>To complete your registration, you will receive a <strong>Stripe</strong> payment link:</p>
         <p><strong>Amount:</strong> <span class="highlight">$${amount.toFixed(2)}</span></p>
-        <p><strong>Memo/Note:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+        <p><strong>Reference:</strong> <code style="background: #fff; padding: 4px 8px; border-radius: 4px;">${memo}</code></p>
+        <p>A secure payment link will be sent to your email. Click the link to pay with credit/debit card.</p>
       `
   }
 }
