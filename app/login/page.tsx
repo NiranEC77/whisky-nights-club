@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Wine } from 'lucide-react'
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams
+}: {
+  searchParams: { error?: string }
+}) {
   const user = await getCurrentUser()
 
   if (user) {
@@ -26,6 +30,14 @@ export default async function LoginPage() {
             Sign in to manage events and registrations
           </p>
         </div>
+
+        {searchParams.error && (
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg">
+            <p className="text-red-300 text-sm">
+              <strong>Error:</strong> {searchParams.error}
+            </p>
+          </div>
+        )}
 
         <Card>
           <CardHeader>

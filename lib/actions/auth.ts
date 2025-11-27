@@ -16,7 +16,7 @@ export async function signIn(formData: FormData) {
   })
 
   if (error) {
-    return { error: error.message }
+    redirect(`/login?error=${encodeURIComponent(error.message)}`)
   }
 
   revalidatePath('/', 'layout')
@@ -42,7 +42,7 @@ export async function signUp(formData: FormData) {
   })
 
   if (error) {
-    return { error: error.message }
+    redirect(`/?error=${encodeURIComponent(error.message)}`)
   }
 
   revalidatePath('/', 'layout')
