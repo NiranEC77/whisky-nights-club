@@ -53,8 +53,8 @@ export default async function MembershipSuccessPage({
                             <h3 className="font-semibold mb-2">What happens next?</h3>
                             <ol className="text-sm text-whisky-cream/80 space-y-2">
                                 <li>1. Complete your payment using the instructions above</li>
-                                <li>2. We'll confirm your payment within 24 hours</li>
-                                <li>3. You'll receive a confirmation email with your membership details</li>
+                                <li>2. We&apos;ll confirm your payment within 24 hours</li>
+                                <li>3. You&apos;ll receive a confirmation email with your membership details</li>
                                 <li>4. Start using your free event access immediately!</li>
                             </ol>
                         </div>

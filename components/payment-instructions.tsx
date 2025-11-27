@@ -73,7 +73,7 @@ export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInst
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">2.</span>
-                                <span>Click "Send & Request"</span>
+                                <span>Click &quot;Send &amp; Request&quot;</span>
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">3.</span>
@@ -121,7 +121,7 @@ export function PaymentInstructions({ paymentMethod, amount, memo }: PaymentInst
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">2.</span>
-                                <span>Tap "New Payment"</span>
+                                <span>Tap &quot;New Payment&quot;</span>
                             </p>
                             <p className="flex items-start gap-2">
                                 <span className="text-whisky-gold mt-1">3.</span>

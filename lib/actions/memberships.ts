@@ -97,7 +97,7 @@ export async function getMembershipById(id: string): Promise<Membership | null> 
 /**
  * Increment membership events used counter
  */
-export async function useMembershipEvent(membershipId: string) {
+export async function incrementMembershipEvent(membershipId: string) {
     const supabase = createServiceClient()
 
     // Get current membership

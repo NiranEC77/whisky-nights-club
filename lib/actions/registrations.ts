@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { revalidatePath } from 'next/cache'
 import { sendRegistrationEmail, sendPaymentConfirmation } from '@/lib/email'
-import { getActiveMembershipByEmail, useMembershipEvent } from './memberships'
+import { getActiveMembershipByEmail, incrementMembershipEvent } from './memberships'
 import { PaymentMethod } from '@/lib/types'
 
 export async function createRegistration(formData: FormData) {
@@ -87,7 +87,7 @@ export async function createRegistration(formData: FormData) {
 
   // If using membership, increment events_used counter
   if (isFreeWithMembership && membershipId) {
-    const result = await useMembershipEvent(membershipId)
+    const result = await incrementMembershipEvent(membershipId)
     if (result.error) {
       console.error('Error updating membership:', result.error)
       // Don't fail the registration, but log the error
