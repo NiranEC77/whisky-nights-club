@@ -121,7 +121,7 @@ export default async function SuccessPage({
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-whisky-gold mt-1">4.</span>
-                <span>You'll receive a confirmation email within 24 hours of payment</span>
+                <span>You&apos;ll receive a confirmation email within 24 hours of payment</span>
               </p>
             </div>
 
