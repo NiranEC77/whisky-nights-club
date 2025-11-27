@@ -21,6 +21,7 @@ export default async function MembershipSuccessPage({
 
     const membershipPrice = parseInt(process.env.NEXT_PUBLIC_MEMBERSHIP_PRICE || '100')
     const memo = `MEMBERSHIP-${params.id.slice(0, 8).toUpperCase()}`
+    const isPaid = membership.payment_status === 'paid'
 
     return (
         <div className="min-h-screen py-12 px-4">
@@ -28,44 +29,73 @@ export default async function MembershipSuccessPage({
                 <div className="text-center mb-8">
                     <CheckCircle2 className="h-16 w-16 text-whisky-gold mx-auto mb-4" />
                     <h1 className="text-4xl font-serif font-bold text-gradient-gold mb-2">
-                        Membership Purchase Successful!
+                        {isPaid ? 'Membership Active!' : 'Membership Purchase Successful!'}
                     </h1>
                     <p className="text-whisky-cream/70">
                         Welcome to the Redhead Whiskey Club
                     </p>
                 </div>
 
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>Payment Instructions</CardTitle>
-                        <CardDescription>
-                            Complete your payment to activate your membership
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <PaymentInstructions
-                            paymentMethod={membership.payment_method || 'stripe'}
-                            amount={membershipPrice}
-                            memo={memo}
-                        />
+                {isPaid ? (
+                    // Already paid (CHEAT code used)
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>🎉 Your Membership is Active!</CardTitle>
+                            <CardDescription>
+                                You can start using your benefits immediately
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-4">
+                                <h3 className="font-semibold mb-3 text-green-300">Your Benefits:</h3>
+                                <ul className="text-sm text-whisky-cream/80 space-y-2">
+                                    <li>✅ 1 Free Event Entry</li>
+                                    <li>✅ Bring 1 Friend Free (one-time)</li>
+                                    <li>✅ Valid until {new Date(membership.end_date).toLocaleDateString()}</li>
+                                </ul>
+                            </div>
 
-                        <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
-                            <h3 className="font-semibold mb-2">What happens next?</h3>
-                            <ol className="text-sm text-whisky-cream/80 space-y-2">
-                                <li>1. Complete your payment using the instructions above</li>
-                                <li>2. We&apos;ll confirm your payment within 24 hours</li>
-                                <li>3. You&apos;ll receive a confirmation email with your membership details</li>
-                                <li>4. Start using your free event access immediately!</li>
-                            </ol>
-                        </div>
+                            <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
+                                <p className="text-sm text-whisky-cream/80">
+                                    <strong>💡 How to use:</strong> When registering for events, use the email address <strong>{membership.email}</strong> to automatically apply your membership benefits.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    // Needs payment
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>Payment Instructions</CardTitle>
+                            <CardDescription>
+                                Complete your payment to activate your membership
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <PaymentInstructions
+                                paymentMethod={membership.payment_method || 'stripe'}
+                                amount={membershipPrice}
+                                memo={memo}
+                            />
 
-                        <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-4">
-                            <p className="text-sm text-green-300">
-                                <strong>💡 Pro Tip:</strong> When registering for events, use the email address <strong>{membership.email}</strong> to automatically apply your membership benefits.
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                            <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
+                                <h3 className="font-semibold mb-2">What happens next?</h3>
+                                <ol className="text-sm text-whisky-cream/80 space-y-2">
+                                    <li>1. Complete your payment using the instructions above</li>
+                                    <li>2. We&apos;ll confirm your payment within 24 hours</li>
+                                    <li>3. You&apos;ll receive a confirmation email with your membership details</li>
+                                    <li>4. Start using your free event access immediately!</li>
+                                </ol>
+                            </div>
+
+                            <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-4">
+                                <p className="text-sm text-green-300">
+                                    <strong>💡 Pro Tip:</strong> When registering for events, use the email address <strong>{membership.email}</strong> to automatically apply your membership benefits.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <div className="flex gap-4">
                     <Link href="/" className="flex-1">
