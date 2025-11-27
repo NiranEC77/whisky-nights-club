@@ -22,11 +22,25 @@ export async function createMembership(formData: FormData) {
         return { error: 'Invalid payment method. Only Stripe and PayPal are supported.' }
     }
 
-    // Check if user already has an active membership
-    const existingMembership = await getActiveMembershipByEmail(email)
-    if (existingMembership) {
-        return {
-            error: `You already have an active membership that expires on ${new Date(existingMembership.end_date).toLocaleDateString()}. You cannot purchase another membership until your current one expires.`
+    // Check if user already has ANY membership (active or expired)
+    const { data: existingMemberships } = await supabase
+        .from('memberships')
+        .select('*')
+        .eq('email', email)
+        .limit(1)
+
+    if (existingMemberships && existingMemberships.length > 0) {
+        const existing = existingMemberships[0]
+        const isExpired = new Date(existing.end_date) < new Date()
+
+        if (isExpired) {
+            return {
+                error: `You already purchased a membership that expired on ${new Date(existing.end_date).toLocaleDateString()}. Please contact support to renew your membership.`
+            }
+        } else {
+            return {
+                error: `You already have an active membership that expires on ${new Date(existing.end_date).toLocaleDateString()}. You cannot purchase another membership.`
+            }
         }
     }
 
