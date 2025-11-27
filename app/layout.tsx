@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/components/header'
 import { Toaster } from '@/components/ui/toaster'
+import { ScrollToTop } from '@/components/scroll-to-top'
 import { getCurrentUser } from '@/lib/actions/auth'
 
 const playfair = Playfair_Display({
@@ -48,6 +49,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-whisky-dark">
+        <ScrollToTop />
         <Header user={user} />
         <main className="min-h-[calc(100vh-80px)]">
           {children}
