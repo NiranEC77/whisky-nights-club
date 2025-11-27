@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { ImageUpload } from '@/components/image-upload'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -77,18 +78,11 @@ export default async function EditEventPage({ params }: { params: { id: string }
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="featured_image">Featured Image</Label>
-                <Input
-                  id="featured_image"
-                  name="featured_image"
-                  placeholder="/images/events/my-event.jpg"
-                  defaultValue={event.featured_image || ''}
-                />
-                <p className="text-xs text-whisky-cream/60">
-                  Optional: Path to event image (e.g., /images/events/bottle.jpg). Upload images to public/images/events/
-                </p>
-              </div>
+              <ImageUpload
+                name="featured_image"
+                label="Featured Image"
+                defaultValue={event.featured_image || undefined}
+              />
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
