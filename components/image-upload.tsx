@@ -65,21 +65,35 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
       const formData = new FormData()
       formData.append('image', file)
 
+      console.log('Sending request to /api/upload-event-image')
+      
       const response = await fetch('/api/upload-event-image', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('Response status:', response.status, response.statusText)
+
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Upload failed:', response.status, errorText)
-        throw new Error(`Upload failed: ${response.status}`)
+        let errorMessage = `Upload failed: ${response.status}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch (e) {
+          const errorText = await response.text()
+          errorMessage = errorText || errorMessage
+        }
+        console.error('Upload failed:', errorMessage)
+        setError(errorMessage)
+        setTempImage(null)
+        return
       }
 
       const result = await response.json()
       console.log('Upload result:', result)
 
       if (result.error) {
+        console.error('Server returned error:', result.error)
         setError(result.error)
         setTempImage(null)
       } else if (result.path) {
