@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Wine } from 'lucide-react'
+import { GlassWater } from 'lucide-react'
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <Wine className="h-20 w-20 text-whisky-gold/40 mx-auto mb-6" />
+        <GlassWater className="h-20 w-20 text-whisky-gold/40 mx-auto mb-6" />
         <h1 className="text-6xl font-serif font-bold text-gradient-gold mb-4">
           404
         </h1>

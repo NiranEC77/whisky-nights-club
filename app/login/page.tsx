@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Wine } from 'lucide-react'
+import { GlassWater } from 'lucide-react'
 
 export default async function LoginPage({
   searchParams
@@ -22,7 +22,7 @@ export default async function LoginPage({
     <div className="min-h-screen flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Wine className="h-12 w-12 text-whisky-gold mx-auto mb-4" />
+          <GlassWater className="h-12 w-12 text-whisky-gold mx-auto mb-4" />
           <h1 className="text-3xl font-serif font-bold text-gradient-gold mb-2">
             Admin Sign In
           </h1>

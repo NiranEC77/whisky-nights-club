@@ -1,6 +1,6 @@
 import { getEvents } from '@/lib/actions/events'
 import { EventCard } from '@/components/event-card'
-import { Wine, Calendar, Users } from 'lucide-react'
+import { GlassWater, Calendar, Users } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,7 +39,7 @@ export default async function HomePage() {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center space-y-3 animate-fade-in">
-              <Wine className="h-12 w-12 text-whisky-gold mx-auto" />
+              <GlassWater className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
                 Curated Experiences
               </h3>
@@ -89,7 +89,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <Wine className="h-16 w-16 text-whisky-gold/40 mx-auto mb-4" />
+              <GlassWater className="h-16 w-16 text-whisky-gold/40 mx-auto mb-4" />
               <p className="text-whisky-cream/60 text-lg">
                 No upcoming events at the moment. Check back soon!
               </p>
