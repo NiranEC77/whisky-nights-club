@@ -26,7 +26,7 @@ export async function getEvents(): Promise<EventWithRegistrations[]> {
   }
 
   return events.map((event) => {
-    const totalTickets = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
+    const totalTickets = event.registrations?.reduce((sum: number, reg: any) => sum + (reg.ticket_count || 1), 0) || 0
     return {
       ...event,
       registered_count: event.registrations?.length || 0,
@@ -65,7 +65,7 @@ export async function getEventById(id: string): Promise<EventWithRegistrations |
     return null
   }
 
-  const totalTickets = event.registrations?.reduce((sum, reg) => sum + (reg.ticket_count || 1), 0) || 0
+  const totalTickets = event.registrations?.reduce((sum: number, reg: any) => sum + (reg.ticket_count || 1), 0) || 0
 
   return {
     ...event,
