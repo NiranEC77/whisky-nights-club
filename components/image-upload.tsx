@@ -98,15 +98,21 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
         setTempImage(null)
       } else if (result.path) {
         // Set preview to uploaded image
+        console.log('Setting preview to:', result.path)
         setPreview(result.path)
         setTempImage(null)
-        
-        // Store the path in hidden input
-        const hiddenInput = document.getElementById(`${name}-path`) as HTMLInputElement
-        if (hiddenInput) {
-          hiddenInput.value = result.path
-        }
         onChange?.(result.path)
+        
+        // Force form to recognize the change
+        setTimeout(() => {
+          const hiddenInput = document.getElementById(`${name}-path`) as HTMLInputElement
+          if (hiddenInput) {
+            console.log('Hidden input value set to:', result.path)
+            hiddenInput.value = result.path
+            // Trigger change event
+            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }))
+          }
+        }, 100)
       }
     } catch (err) {
       console.error('Upload error:', err)
@@ -146,7 +152,13 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
       <Label htmlFor={name}>{label}</Label>
       
       {/* Hidden input to store the uploaded path */}
-      <input type="hidden" id={`${name}-path`} name={name} defaultValue={defaultValue || ''} />
+      <input 
+        type="hidden" 
+        id={`${name}-path`} 
+        name={name} 
+        value={preview || ''} 
+        readOnly
+      />
       
       {preview ? (
         <div className="relative w-full h-48 rounded-lg overflow-hidden border border-whisky-gold/30">
@@ -155,6 +167,7 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
             alt="Preview"
             fill
             className="object-cover"
+            unoptimized
           />
           <Button
             type="button"
