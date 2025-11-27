@@ -1,10 +1,12 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { revalidatePath } from 'next/cache'
 
 export async function createRegistration(formData: FormData) {
-  const supabase = await createClient()
+  // Use service client for public registration (no auth needed)
+  const supabase = createServiceClient()
 
   const eventId = formData.get('event_id') as string
   const fullName = formData.get('full_name') as string
