@@ -56,16 +56,28 @@ export function ImageUpload({ name, label, defaultValue, onChange }: ImageUpload
     setError(null)
 
     try {
+      // Create a File object with explicit JPEG type
+      const file = new File([croppedBlob], 'cropped-image.jpg', { type: 'image/jpeg' })
+      
+      console.log('Uploading cropped image:', file.size, 'bytes, type:', file.type)
+      
       // Create FormData with cropped image
       const formData = new FormData()
-      formData.append('image', croppedBlob, 'cropped-image.jpg')
+      formData.append('image', file)
 
       const response = await fetch('/api/upload-event-image', {
         method: 'POST',
         body: formData,
       })
 
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Upload failed:', response.status, errorText)
+        throw new Error(`Upload failed: ${response.status}`)
+      }
+
       const result = await response.json()
+      console.log('Upload result:', result)
 
       if (result.error) {
         setError(result.error)

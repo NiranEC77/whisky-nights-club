@@ -73,10 +73,13 @@ export function ImageCropper({ imageSrc, onCropComplete, onCancel, open }: Image
       croppedAreaPixels.height
     )
 
-    // Convert to blob
+    // Convert to blob with explicit JPEG type
     canvas.toBlob((blob) => {
       if (blob) {
+        console.log('Cropped blob created:', blob.size, 'bytes, type:', blob.type)
         onCropComplete(blob)
+      } else {
+        console.error('Failed to create blob from canvas')
       }
     }, 'image/jpeg', 0.9)
   }

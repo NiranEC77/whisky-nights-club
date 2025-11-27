@@ -12,11 +12,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    // Validate file type (more lenient for cropped images)
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/octet-stream']
     if (!allowedTypes.includes(file.type)) {
+      console.error('Invalid file type:', file.type)
       return NextResponse.json(
-        { error: 'Invalid file type. Please upload JPG, PNG, or WebP images.' },
+        { error: `Invalid file type: ${file.type}. Please upload JPG, PNG, or WebP images.` },
         { status: 400 }
       )
     }
@@ -34,15 +35,17 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     
-    // Create safe filename
+    // Create safe filename - always use .jpg for cropped images
     const timestamp = Date.now()
     const randomString = randomBytes(8).toString('hex')
-    const extension = file.name.split('.').pop()
-    const filename = `event-${timestamp}-${randomString}.${extension}`
+    const filename = `event-${timestamp}-${randomString}.jpg`
 
     // Save to public/images/events
     const publicPath = join(process.cwd(), 'public', 'images', 'events', filename)
+    
+    console.log('Attempting to write file to:', publicPath)
     await writeFile(publicPath, buffer)
+    console.log('File written successfully:', filename)
 
     // Return path for database
     const dbPath = `/images/events/${filename}`
