@@ -23,10 +23,10 @@ export default async function HomePage() {
               Redhead WHISKY
             </h1>
             <p className="text-xl md:text-2xl text-whisky-cream/80 animate-fade-in">
-              Experience the finest spirits in an atmosphere of elegance and warmth
+              Bringing people together through good drinks, delicious food, and great conversation
             </p>
             <p className="text-lg text-whisky-cream/60 animate-fade-in">
-              Join us for exclusive virtual whisky tasting events
+              Join our virtual whisky club experiences
             </p>
           </div>
         </div>
@@ -37,30 +37,30 @@ export default async function HomePage() {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center space-y-3 animate-fade-in">
-              <Calendar className="h-12 w-12 text-whisky-gold mx-auto" />
+              <Wine className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                Regular Events
+                Virtual Tastings
               </h3>
               <p className="text-whisky-cream/70">
-                Monthly tastings featuring rare and exceptional whiskies
+                Join from anywhere and taste together as a community
               </p>
             </div>
             <div className="text-center space-y-3 animate-fade-in">
               <Users className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                Intimate Gatherings
+                The Togetherness
               </h3>
               <p className="text-whisky-cream/70">
-                Limited seating for a personal and engaging experience
+                Building community through shared whisky experiences
               </p>
             </div>
             <div className="text-center space-y-3 animate-fade-in">
-              <Wine className="h-12 w-12 text-whisky-gold mx-auto" />
+              <Calendar className="h-12 w-12 text-whisky-gold mx-auto" />
               <h3 className="text-xl font-serif font-semibold text-whisky-gold">
-                Expert Guidance
+                Regular Meetups
               </h3>
               <p className="text-whisky-cream/70">
-                Learn from experienced connoisseurs and enthusiasts
+                Join our club events and discover new favorites together
               </p>
             </div>
           </div>

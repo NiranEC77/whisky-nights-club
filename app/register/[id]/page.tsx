@@ -75,15 +75,15 @@ export default async function RegisterPage({
               <input type="hidden" name="event_id" value={event.id} />
 
               <div className="space-y-2">
-                <Label htmlFor="ticket_count">Number of Tickets *</Label>
+                <Label htmlFor="ticket_count">How many people registering? *</Label>
                 <Select name="ticket_count" defaultValue="1" required>
                   <SelectTrigger id="ticket_count">
-                    <SelectValue placeholder="Select tickets" />
+                    <SelectValue placeholder="Select number" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 Ticket - {formatCurrency(event.price)}</SelectItem>
+                    <SelectItem value="1">One is fun - {formatCurrency(event.price)}</SelectItem>
                     <SelectItem value="2" disabled={event.available_seats < 2}>
-                      2 Tickets - {formatCurrency(event.price * 2)}
+                      Two is charm - {formatCurrency(event.price * 2)}
                       {event.available_seats < 2 && ' (Not enough seats)'}
                     </SelectItem>
                   </SelectContent>

@@ -127,8 +127,8 @@ export default async function SuccessPage({
 
             <div className="bg-whisky-gold/10 border border-whisky-gold/30 rounded-lg p-4">
               <p className="text-sm text-whisky-cream/80">
-                <strong>Important:</strong> Your registration is pending until payment is confirmed.
-                If you have any questions, please contact us at {zelleEmail}
+                <strong>Looking forward to tasting together!</strong> Your registration is pending until payment is confirmed.
+                Questions? Reach out at {zelleEmail}
               </p>
             </div>
           </CardContent>
