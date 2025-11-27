@@ -15,6 +15,7 @@ export interface Event {
   start_time: string
   price: number
   max_seats: number
+  featured_image: string | null
   created_by: string
   created_at: string
   creator?: Profile

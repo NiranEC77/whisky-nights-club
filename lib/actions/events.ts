@@ -94,6 +94,8 @@ export async function createEvent(formData: FormData) {
     return { error: 'Unauthorized: Admin access required' }
   }
 
+  const featuredImage = formData.get('featured_image') as string
+  
   const eventData = {
     title: formData.get('title') as string,
     description: formData.get('description') as string,
@@ -101,6 +103,7 @@ export async function createEvent(formData: FormData) {
     start_time: formData.get('start_time') as string,
     price: parseInt(formData.get('price') as string),
     max_seats: parseInt(formData.get('max_seats') as string),
+    featured_image: featuredImage || null,
     created_by: user.id,
   }
 
@@ -140,6 +143,8 @@ export async function updateEvent(id: string, formData: FormData) {
     return { error: 'Unauthorized: Admin access required' }
   }
 
+  const featuredImage = formData.get('featured_image') as string
+  
   const eventData = {
     title: formData.get('title') as string,
     description: formData.get('description') as string,
@@ -147,6 +152,7 @@ export async function updateEvent(id: string, formData: FormData) {
     start_time: formData.get('start_time') as string,
     price: parseInt(formData.get('price') as string),
     max_seats: parseInt(formData.get('max_seats') as string),
+    featured_image: featuredImage || null,
   }
 
   const { data, error } = await supabase

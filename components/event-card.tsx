@@ -15,7 +15,14 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Card className="overflow-hidden hover:scale-[1.02] transition-all duration-300 animate-fade-in">
       <div className="h-48 bg-gradient-to-br from-whisky-bourbon/30 via-whisky-gold/20 to-whisky-amber/30 relative">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=800')] bg-cover bg-center opacity-40" />
+        {event.featured_image ? (
+          <div 
+            className="absolute inset-0 bg-cover bg-center" 
+            style={{ backgroundImage: `url('${event.featured_image}')` }}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=800')] bg-cover bg-center opacity-40" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-whisky-darker to-transparent" />
       </div>
 
