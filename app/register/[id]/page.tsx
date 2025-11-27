@@ -9,7 +9,13 @@ import { formatDate, formatCurrency } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
-export default async function RegisterPage({ params }: { params: { id: string } }) {
+export default async function RegisterPage({ 
+  params,
+  searchParams 
+}: { 
+  params: { id: string }
+  searchParams: { error?: string }
+}) {
   const event = await getEventById(params.id)
 
   if (!event) {
@@ -26,12 +32,14 @@ export default async function RegisterPage({ params }: { params: { id: string } 
     const result = await createRegistration(formData)
     
     if (result.error) {
-      // In a real app, you'd want to show this error to the user
-      console.error(result.error)
-      return
+      console.error('Registration error:', result.error)
+      // Redirect back with error message
+      redirect(`/register/${params.id}?error=${encodeURIComponent(result.error)}`)
     }
     
-    redirect(`/success/${params.id}?registration=${result.data?.id}`)
+    if (result.data) {
+      redirect(`/success/${params.id}?registration=${result.data.id}`)
+    }
   }
 
   return (
@@ -45,6 +53,14 @@ export default async function RegisterPage({ params }: { params: { id: string } 
             {event.title}
           </p>
         </div>
+
+        {searchParams.error && (
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg">
+            <p className="text-red-300 text-sm">
+              <strong>Error:</strong> {searchParams.error}
+            </p>
+          </div>
+        )}
 
         <Card>
           <CardHeader>
@@ -64,6 +80,7 @@ export default async function RegisterPage({ params }: { params: { id: string } 
                   name="full_name"
                   placeholder="John Smith"
                   required
+                  minLength={2}
                 />
               </div>
 
@@ -86,6 +103,7 @@ export default async function RegisterPage({ params }: { params: { id: string } 
                   type="tel"
                   placeholder="(555) 123-4567"
                   required
+                  minLength={10}
                 />
               </div>
 
@@ -116,7 +134,7 @@ export default async function RegisterPage({ params }: { params: { id: string } 
               </Button>
 
               <p className="text-xs text-center text-whisky-cream/60">
-                By registering, you agree to receive payment instructions via email.
+                By registering, you agree to receive payment instructions.
                 Your spot will be reserved upon payment confirmation.
               </p>
             </form>
@@ -126,4 +144,3 @@ export default async function RegisterPage({ params }: { params: { id: string } 
     </div>
   )
 }
-

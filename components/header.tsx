@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Wine, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -30,8 +31,16 @@ export function Header({ user }: HeaderProps) {
   return (
     <header className="border-b border-whisky-gold/20 bg-whisky-darker/80 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <Wine className="h-8 w-8 text-whisky-gold group-hover:scale-110 transition-transform" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative h-12 w-12 group-hover:scale-110 transition-transform">
+            <Image 
+              src="/images/logo.png" 
+              alt="Redhead WHISKY Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
           <h1 className="text-2xl font-serif font-bold text-gradient-gold">
             Redhead WHISKY
           </h1>
