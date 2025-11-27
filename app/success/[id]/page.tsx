@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation'
 import { getEventById } from '@/lib/actions/events'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { CopyButton } from '@/components/copy-button'
 import Link from 'next/link'
-import { CheckCircle2, Copy } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
@@ -62,13 +63,7 @@ export default async function SuccessPage({
                       <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
                         {zelleEmail}
                       </code>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => navigator.clipboard.writeText(zelleEmail)}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                      <CopyButton text={zelleEmail} />
                     </div>
                   </div>
                 )}
@@ -80,13 +75,7 @@ export default async function SuccessPage({
                       <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
                         {zellePhone}
                       </code>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => navigator.clipboard.writeText(zellePhone)}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                      <CopyButton text={zellePhone} />
                     </div>
                   </div>
                 )}
@@ -97,13 +86,7 @@ export default async function SuccessPage({
                     <code className="flex-1 bg-whisky-dark/50 px-3 py-2 rounded text-whisky-gold">
                       {memo}
                     </code>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => navigator.clipboard.writeText(memo)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
+                    <CopyButton text={memo} />
                   </div>
                   <p className="text-xs text-whisky-cream/60 mt-2">
                     ⚠️ Please include this memo in your Zelle payment to help us identify your registration
